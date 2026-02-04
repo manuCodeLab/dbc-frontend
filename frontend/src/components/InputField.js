@@ -1,68 +1,93 @@
 import React from 'react';
-import { View, TextInput, Text, StyleSheet } from 'react-native';
-import { COLORS } from '../styles/colors';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-const InputField = ({
+export default function InputField({
+  label,
+  required,
   placeholder,
   value,
   onChangeText,
-  keyboardType = 'default',
-  countryCode = '+91',
-  showCountry = false,
-}) => {
+  keyboardType,
+  showCountry,
+  countryCode,
+  icon,
+  error,
+}) {
   return (
-    <View style={styles.container}>
-      {showCountry && (
-        <View style={styles.codeBox}>
-          <Text style={styles.codeText}>{countryCode}</Text>
+    <View style={styles.wrapper}>
+      {/* Label row */}
+      <View style={styles.labelRow}>
+        <View style={styles.left}>
+          <Ionicons name={icon} size={17} color="#6b0f1a" />
+          <Text style={styles.label}>
+            {'  '}{label}
+            {required && <Text style={styles.star}> *</Text>}
+          </Text>
         </View>
-      )}
-      <TextInput
-        style={[styles.input, showCountry ? { flex: 1 } : null]}
-        placeholder={placeholder}
-        placeholderTextColor="#9CA3AF"
-        keyboardType={keyboardType}
-        value={value}
-        onChangeText={onChangeText}
-      />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+      </View>
+
+      {/* Input box */}
+      <View style={[styles.inputBox, error && { borderColor: '#DC2626' }]}>
+        {showCountry && (
+          <View style={styles.countryPill}>
+            <Text style={styles.countryText}>{countryCode}</Text>
+          </View>
+        )}
+
+        <TextInput
+          style={styles.input}
+          placeholder={placeholder}
+          placeholderTextColor="#9CA3AF"
+          keyboardType={keyboardType || 'default'}
+          value={value ?? ''}
+          onChangeText={onChangeText}
+        />
+      </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: { marginBottom: 20 },
+
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+
+  left: { flexDirection: 'row', alignItems: 'center' },
+
+  label: { fontSize: 15, fontWeight: '600', color: '#374151' },
+
+  star: { color: '#DC2626', fontWeight: '700' },
+
+  error: { color: '#DC2626', fontSize: 12 },
+
+  inputBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.card,
-    borderColor: COLORS.border,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 8,
-    marginVertical: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.03,
-    shadowRadius: 6,
-    elevation: 1,
+    height: 58,
+    borderWidth: 1.8,
+    borderColor: '#E5E7EB',
+    borderRadius: 22,
+    paddingHorizontal: 14,
+    backgroundColor: '#fff',
+    elevation: 3,
   },
-  codeBox: {
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    backgroundColor: '#FFF',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    marginRight: 8,
-  },
-  codeText: {
-    color: COLORS.text,
-    fontWeight: '600',
-  },
-  input: {
-    paddingVertical: 8,
-    paddingHorizontal: 6,
-    color: COLORS.text,
-    fontSize: 16,
-  },
-});
 
-export default InputField;
+  countryPill: {
+    backgroundColor: '#F3F4F6',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginRight: 10,
+  },
+
+  countryText: { fontWeight: '600', color: '#111827' },
+
+  input: { flex: 1, fontSize: 16, color: '#111827' },
+});

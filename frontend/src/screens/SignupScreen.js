@@ -1,219 +1,230 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  KeyboardAvoidingView,
-  Platform,
   TouchableOpacity,
   TextInput,
-  Dimensions,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import HeaderGradient from '../components/HeaderGradient';
 import InputField from '../components/InputField';
 import PrimaryButton from '../components/PrimaryButton';
-import { COLORS } from '../styles/colors';
-
-const { width } = Dimensions.get('window');
 
 export default function SignupScreen({ navigation }) {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [otpVisible, setOtpVisible] = useState(false);
 
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [timer, setTimer] = useState(30);
-  const [canResend, setCanResend] = useState(false);
-  const inputs = useRef([]);
+  const [form, setForm] = useState({
+    first: '',
+    middle: '',
+    last: '',
+    phone: '',
+    email: '',
+    otp: '',
+  });
 
-  useEffect(() => {
-    let interval;
-    if (otpSent && timer > 0) {
-      interval = setInterval(() => setTimer((t) => t - 1), 1000);
-    }
-    if (timer === 0) setCanResend(true);
-    return () => clearInterval(interval);
-  }, [otpSent, timer]);
+  const [errors, setErrors] = useState({});
 
-  const handlePhoneChange = (text) => {
-    let cleaned = text.replace(/\D/g, '');
-    if (cleaned.length > 10) cleaned = cleaned.slice(0, 10);
-    setPhone(cleaned);
-  };
+  const onlyLetters = (v) => /^[A-Za-z]+$/.test(v);
+  const lastNameRule = (v) => /^[A-Za-z]+( [A-Za-z]+)?$/.test(v);
+  const validPhone = (v) => /^[6-9]\d{9}$/.test(v);
+  const validEmail = (v) => /^\S+@\S+\.\S+$/.test(v);
 
-  const handleSendOtp = () => {
-    if (!firstName || !email) {
-      Alert.alert('Fill all fields');
-      return;
+  const validateField = (name, value) => {
+    let msg = '';
+
+    if (name === 'first') {
+      if (!value) msg = 'Required';
+      else if (!onlyLetters(value)) msg = 'Only letters';
     }
 
-    if (!/^[6-9]\d{9}$/.test(phone)) {
-      Alert.alert('Invalid Indian mobile number');
-      return;
+    if (name === 'middle') {
+      if (value && !onlyLetters(value)) msg = 'Only letters';
     }
 
-    Alert.alert('OTP Sent ✅', 'Dummy OTP is 123456');
-
-    setOtpSent(true);
-    setTimer(30);
-    setCanResend(false);
-  };
-
-  const handleResendOtp = () => {
-    if (!canResend) return;
-    Alert.alert('OTP Resent ✅', 'Dummy OTP is 123456');
-    setTimer(30);
-    setCanResend(false);
-  };
-
-  const handleOtpChange = (val, index) => {
-    const copy = [...otp];
-    copy[index] = val;
-    setOtp(copy);
-    if (val && index < 5) inputs.current[index + 1].focus();
-  };
-
-  const handleKeyPress = (e, index) => {
-    if (e.nativeEvent.key === 'Backspace') {
-      if (otp[index] === '' && index > 0) {
-        inputs.current[index - 1].focus();
-      }
-      const copy = [...otp];
-      copy[index] = '';
-      setOtp(copy);
+    if (name === 'last') {
+      if (!value) msg = 'Required';
+      else if (!lastNameRule(value)) msg = 'One space allowed (T R)';
     }
+
+    if (name === 'phone') {
+      if (!validPhone(value)) msg = 'Enter valid number';
+    }
+
+    if (name === 'email') {
+      if (!validEmail(value)) msg = 'Enter valid email';
+    }
+
+    if (name === 'otp') {
+      if (value.length !== 6) msg = 'Enter 6 digit OTP';
+    }
+
+    setErrors((prev) => ({ ...prev, [name]: msg }));
   };
 
-  const handleCreateAccount = () => {
-    if (otp.join('') === '123456') {
-      Alert.alert('Account Created 🎉');
-      navigation.navigate('Login');
-    } else {
-      Alert.alert('Wrong OTP ❌');
-      setOtp(['', '', '', '', '', '']);
-      inputs.current[0]?.focus();
+  const handleChange = (name, value) => {
+    let clean = value;
+
+    if (name === 'first' || name === 'middle') {
+      clean = value.replace(/[^A-Za-z]/g, '');
     }
+
+    if (name === 'last') {
+      clean = value.replace(/[^A-Za-z ]/g, '');
+      if ((clean.match(/ /g) || []).length > 1) return;
+    }
+
+    if (name === 'phone') {
+      clean = value.replace(/\D/g, '').slice(0, 10);
+    }
+
+    setForm((prev) => {
+      const updated = { ...prev, [name]: clean };
+      validateField(name, clean);
+      return updated;
+    });
   };
+
+  const formValid =
+    form.first.trim() !== '' &&
+    form.last.trim() !== '' &&
+    validPhone(form.phone) &&
+    validEmail(form.email) &&
+    !errors.first &&
+    !errors.last &&
+    !errors.phone &&
+    !errors.email;
 
   return (
     <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-      >
-        <ScrollView contentContainerStyle={styles.container}>
-          <HeaderGradient style={styles.header}>
-            <Text style={styles.appTitle}>Create Account</Text>
-          </HeaderGradient>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <HeaderGradient style={styles.header}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={20} color="#fff" />
+          </TouchableOpacity>
 
-          <View style={styles.card}>
-            <InputField placeholder="First Name" value={firstName} onChangeText={setFirstName} />
-            <InputField placeholder="Last Name" value={lastName} onChangeText={setLastName} />
-            <InputField placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" />
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>Join us today</Text>
+        </HeaderGradient>
 
-            <InputField
-              placeholder="Mobile Number"
-              value={phone}
-              onChangeText={handlePhoneChange}
-              keyboardType="number-pad"
-              showCountry
-              countryCode="+91"
-              maxLength={10}
-            />
+        <View style={styles.card}>
+          <InputField
+            label="First Name"
+            required
+            icon="person-outline"
+            placeholder="Enter first name"
+            value={form.first}
+            onChangeText={(v) => handleChange('first', v)}
+            error={errors.first}
+          />
 
-            <PrimaryButton title="Send OTP" onPress={handleSendOtp} />
+          <InputField
+            label="Middle Name (optional)"
+            icon="person-outline"
+            placeholder="Enter middle name"
+            value={form.middle}
+            onChangeText={(v) => handleChange('middle', v)}
+            error={errors.middle}
+          />
 
-            {otpSent && (
-              <>
-                <View style={styles.otpRow}>
-                  {otp.map((d, i) => (
-                    <TextInput
-                      key={i}
-                      ref={(r) => (inputs.current[i] = r)}
-                      style={styles.otpBox}
-                      maxLength={1}
-                      keyboardType="number-pad"
-                      value={d}
-                      onChangeText={(v) => handleOtpChange(v, i)}
-                      onKeyPress={(e) => handleKeyPress(e, i)}
-                    />
-                  ))}
-                </View>
+          <InputField
+            label="Last Name"
+            required
+            icon="person-outline"
+            placeholder="Enter last name"
+            value={form.last}
+            onChangeText={(v) => handleChange('last', v)}
+            error={errors.last}
+          />
 
-                <TouchableOpacity
-                  onPress={handleResendOtp}
-                  disabled={!canResend}
-                  style={styles.resendWrap}
-                >
-                  <Text style={styles.resendText}>
-                    {canResend ? 'Resend OTP' : `Resend OTP in ${timer}s`}
-                  </Text>
-                </TouchableOpacity>
+          <InputField
+            label="Mobile Number"
+            required
+            icon="call-outline"
+            showCountry
+            countryCode="+91"
+            placeholder="Enter mobile number"
+            value={form.phone}
+            onChangeText={(v) => handleChange('phone', v)}
+            error={errors.phone}
+          />
 
-                <PrimaryButton title="Create Account" onPress={handleCreateAccount} />
-              </>
-            )}
+          <InputField
+            label="Email"
+            required
+            icon="mail-outline"
+            placeholder="Enter email"
+            value={form.email}
+            onChangeText={(v) => handleChange('email', v)}
+            error={errors.email}
+          />
 
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.loginText}>Already have account? Login</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+          <PrimaryButton
+            title="Validate OTP"
+            disabled={!formValid}
+            onPress={() => setOtpVisible(true)}
+          />
+
+          {otpVisible && (
+            <View style={styles.otpBox}>
+              <TextInput
+                placeholder="Enter OTP"
+                keyboardType="number-pad"
+                value={form.otp}
+                onChangeText={(v) => handleChange('otp', v)}
+              />
+            </View>
+          )}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.background },
-  container: { flexGrow: 1 },
+  safe: { flex: 1, backgroundColor: '#f8f9fb' },
 
   header: {
-    height: 200,
-    alignItems: 'center',
+    height: 230,
     justifyContent: 'center',
+    alignItems: 'center',
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
   },
 
-  appTitle: { color: '#FFF', fontSize: 22, fontWeight: '700' },
+  backBtn: {
+    position: 'absolute',
+    left: 20,
+    top: 55,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    padding: 10,
+    borderRadius: 30,
+  },
+
+  title: { color: '#fff', fontSize: 26, fontWeight: '700' },
+  subtitle: { color: '#fff', marginTop: 6 },
 
   card: {
-    backgroundColor: COLORS.card,
-    margin: 20,
-    borderRadius: 16,
-    padding: 18,
+    backgroundColor: '#fff',
+    marginHorizontal: 20,
+    marginTop: -55,
+    borderRadius: 28,
+    padding: 22,
+    elevation: 6,
   },
 
-  otpRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 18,
-  },
   otpBox: {
-    width: width / 8,
-    height: 48,
-    borderWidth: 1.5,
-    borderColor: COLORS.primary,
-    borderRadius: 10,
-    textAlign: 'center',
-    fontSize: 20,
-  },
-
-  resendWrap: { alignItems: 'center', marginTop: 10 },
-  resendText: {
-    color: COLORS.primary,
-    textDecorationLine: 'underline',
-    fontWeight: '600',
-  },
-
-  loginText: {
-    textAlign: 'center',
-    marginTop: 18,
-    color: COLORS.primary,
-    fontWeight: '600',
+    borderWidth: 2,
+    borderColor: '#6b0f1a',
+    borderRadius: 22,
+    height: 58,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    marginTop: 12,
   },
 });
