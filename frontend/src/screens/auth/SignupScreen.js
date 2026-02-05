@@ -12,10 +12,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import HeaderGradient from '../components/HeaderGradient';
-import InputField from '../components/InputField';
-import PrimaryButton from '../components/PrimaryButton';
-import { COLORS } from '../styles/colors';
+import Header from '../../components/common/Header';
+import InputField from '../../components/form/InputField';
+import PrimaryButton from '../../components/buttons/PrimaryButton';
+import { COLORS } from '../../styles/colors';
 
 export default function SignupScreen({ navigation }) {
   const [otpVisible, setOtpVisible] = useState(false);
@@ -123,7 +123,7 @@ export default function SignupScreen({ navigation }) {
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
         >
-          <HeaderGradient style={styles.header}>
+          <Header style={styles.header}>
             <TouchableOpacity
               style={styles.backBtn}
               onPress={() => navigation.goBack()}
@@ -133,7 +133,7 @@ export default function SignupScreen({ navigation }) {
 
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>Join us today</Text>
-          </HeaderGradient>
+          </Header>
 
           <View style={styles.card}>
             {/* Inputs unchanged */}

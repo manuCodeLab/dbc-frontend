@@ -1,24 +1,34 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import { COLORS } from "../styles/colors";
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Dimensions,
+  Alert,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../../styles/colors';
 
 const { width } = Dimensions.get('window');
 
 export default function DashboardScreen({ navigation }) {
-  const [userName] = useState("Nandu Kumar");
+  const [userName] = useState('Nandu Kumar');
   const [cardShares] = useState(245);
   const [views] = useState(1250);
 
   const handleCardAction = (action) => {
-    Alert.alert(`${action}`, `Feature coming soon!`);
+    Alert.alert(`${action}`, 'Feature coming soon!');
   };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+      >
         {/* PREMIUM HEADER */}
         <View style={styles.header}>
           <View style={styles.profileSection}>
@@ -71,50 +81,52 @@ export default function DashboardScreen({ navigation }) {
         {/* QUICK ACTIONS GRID */}
         <Text style={styles.sectionTitle}>Quick Actions</Text>
         <View style={styles.grid}>
-          <ActionCard 
-            title="Edit Profile" 
-            icon="person-outline" 
+          <ActionCard
+            title="Edit Profile"
+            icon="person-outline"
             color={COLORS.accent}
             onPress={() => handleCardAction('Edit Profile')}
           />
-          <ActionCard 
-            title="Share Card" 
-            icon="share-social" 
+          <ActionCard
+            title="Share Card"
+            icon="share-social"
             color={COLORS.accent}
             onPress={() => handleCardAction('Share Card')}
           />
-          <ActionCard 
-            title="Analytics" 
-            icon="bar-chart-outline" 
+          <ActionCard
+            title="Analytics"
+            icon="bar-chart-outline"
             color={COLORS.accent}
             onPress={() => handleCardAction('Analytics')}
           />
-          <ActionCard 
-            title="Contacts" 
-            icon="people-outline" 
+          <ActionCard
+            title="Contacts"
+            icon="people-outline"
             color={COLORS.accent}
             onPress={() => handleCardAction('Contacts')}
           />
-          <ActionCard 
-            title="Templates" 
-            icon="layers-outline" 
+          <ActionCard
+            title="Templates"
+            icon="layers-outline"
             color={COLORS.accent}
             onPress={() => handleCardAction('Templates')}
           />
-          <ActionCard 
-            title="Settings" 
-            icon="settings-outline" 
+          <ActionCard
+            title="Settings"
+            icon="settings-outline"
             color={COLORS.accent}
             onPress={() => handleCardAction('Settings')}
           />
         </View>
 
         {/* LOGOUT BUTTON */}
-        <TouchableOpacity style={styles.logoutBtn} onPress={() => navigation.replace('Login')}>
+        <TouchableOpacity
+          style={styles.logoutBtn}
+          onPress={() => navigation.replace('Splash')}
+        >
           <Ionicons name="log-out-outline" size={20} color={COLORS.primary} />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
-
       </ScrollView>
     </SafeAreaView>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../styles/colors';
+import { COLORS } from '../../styles/colors';
 
 export default function InputField({
   label,
@@ -133,4 +133,3 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
 });
-

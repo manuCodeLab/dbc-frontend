@@ -1,29 +1,32 @@
 import React, { useEffect } from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
-import { COLORS } from '../styles/colors';
+import { View, Text, StyleSheet, Image } from 'react-native';
+import { COLORS } from '../../styles/colors';
 
 export default function SplashScreen({ navigation }) {
   useEffect(() => {
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       navigation.replace('Login');
-    }, 2500); // 2.5 sec
+    }, 2500); // 2.5 seconds
 
-    return () => clearTimeout(t);
-  }, []);
+    return () => clearTimeout(timer);
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
-      {/* White circle logo */}
+      {/* Logo Circle */}
       <View style={styles.circle}>
         <Image
-          source={require('../../assets/splash-icon.png')} // your bag image
+          source={require('../../../assets/splash-icon.png')}
           style={styles.logo}
           resizeMode="contain"
         />
       </View>
 
-      {/* Text under logo */}
-      <Text style={styles.subtitle}>Grow your business digitally</Text>
+      {/* App Name */}
+      <Text style={styles.appName}>Digital Business Card</Text>
+
+      {/* Tagline */}
+      <Text style={styles.tagline}>Grow your business digitally</Text>
     </View>
   );
 }
@@ -35,7 +38,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   circle: {
     backgroundColor: COLORS.accent,
     width: 280,
@@ -49,18 +51,24 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 8,
   },
-
-  logo: {
-    width: 250,
-    height: 250,
+  icon: {
+    fontSize: 120,
   },
-
-  subtitle: {
+  logo: {
+    width: 220,
+    height: 220,
+  },
+  appName: {
     color: COLORS.accent,
-    marginTop: 8,
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 28,
+    fontWeight: '700',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  tagline: {
+    color: '#ccc',
+    fontSize: 16,
+    fontWeight: '500',
     letterSpacing: 0.5,
   },
-
 });

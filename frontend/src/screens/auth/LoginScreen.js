@@ -12,10 +12,10 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import HeaderGradient from '../components/HeaderGradient';
-import InputField from '../components/InputField';
-import PrimaryButton from '../components/PrimaryButton';
-import { COLORS } from '../styles/colors';
+import Header from '../../components/common/Header';
+import InputField from '../../components/form/InputField';
+import PrimaryButton from '../../components/buttons/PrimaryButton';
+import { COLORS } from '../../styles/colors';
 
 const { width } = Dimensions.get('window');
 
@@ -85,6 +85,7 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = () => {
     if (otp.join('') === '123456') {
       Alert.alert('Success 🎉', 'OTP Verified');
+      navigation.replace('Dashboard');
     } else {
       Alert.alert('Wrong OTP ❌', 'Enter 123456');
       resetOtpBoxes();
@@ -100,13 +101,13 @@ export default function LoginScreen({ navigation }) {
         <ScrollView contentContainerStyle={styles.container}>
           <View style={{ flex: 1 }}>
 
-            <HeaderGradient style={styles.header}>
+            <Header style={styles.header}>
               <View style={styles.iconWrap}>
                 <Text style={styles.icon}>💼</Text>
               </View>
               <Text style={styles.appTitle}>Digital Business Card</Text>
               <Text style={styles.subtitle}>Grow your business digitally</Text>
-            </HeaderGradient>
+            </Header>
 
             <View style={styles.card}>
               <InputField
@@ -248,19 +249,20 @@ const styles = StyleSheet.create({
   otpBox: {
     width: width / 8,
     height: 48,
-    borderWidth: 1.5,
-    borderColor: COLORS.primary,
+    borderWidth: 2,
+    borderColor: COLORS.accent,
     borderRadius: 10,
     textAlign: 'center',
     fontSize: 20,
     color: COLORS.text,
+    fontWeight: '700',
   },
   resendWrap: {
     alignItems: 'center',
     marginTop: 10,
   },
   resendText: {
-    color: COLORS.primary,
+    color: COLORS.accent,
     fontWeight: '700',
     textDecorationLine: 'underline',
   },
@@ -274,11 +276,11 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     height: 1,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: COLORS.accent,
   },
   newHereText: {
     marginHorizontal: 12,
-    color: '#6B7280',
+    color: COLORS.text,
     fontSize: 13,
     fontWeight: '500',
   },
@@ -289,17 +291,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   createText: {
-    color: '#374151',
+    color: COLORS.text,
     fontSize: 15,
     fontWeight: '500',
   },
   signupText: {
-    color: COLORS.primary,
+    color: COLORS.accent,
     fontSize: 15,
     fontWeight: '700',
   },
   loginBtn: {
-  backgroundColor: '#5B0F1A',  // burgundy
+  backgroundColor: COLORS.accent,
   marginTop: 10,
 },
 
