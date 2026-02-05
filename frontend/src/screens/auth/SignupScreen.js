@@ -15,7 +15,7 @@ import Header from '../../components/common/Header';
 import InputField from '../../components/form/InputField';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
 import { COLORS } from '../../styles/colors';
-import { signupStyles } from '../../styles/signupStyles';
+import { signupStyles } from '../../styles/screens/signupStyles';
 
 export default function SignupScreen({ navigation }) {
   const [otpVisible, setOtpVisible] = useState(false);

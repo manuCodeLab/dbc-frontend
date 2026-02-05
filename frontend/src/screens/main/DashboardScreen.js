@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../styles/colors';
-import { dashboardStyles } from '../../styles/dashboardStyles';
+import { dashboardStyles } from '../../styles/screens/dashboardStyles';
 
 export default function DashboardScreen({ navigation }) {
   const [userName] = useState('Nandu Kumar');

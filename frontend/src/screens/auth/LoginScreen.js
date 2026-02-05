@@ -15,7 +15,7 @@ import Header from '../../components/common/Header';
 import InputField from '../../components/form/InputField';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
 import { COLORS } from '../../styles/colors';
-import { loginStyles } from '../../styles/loginStyles';
+import { loginStyles } from '../../styles/screens/loginStyles';
 
 const { width } = Dimensions.get('window');
 
