@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -16,6 +15,7 @@ import Header from '../../components/common/Header';
 import InputField from '../../components/form/InputField';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
 import { COLORS } from '../../styles/colors';
+import { signupStyles } from '../../styles/signupStyles';
 
 export default function SignupScreen({ navigation }) {
   const [otpVisible, setOtpVisible] = useState(false);
@@ -114,28 +114,28 @@ export default function SignupScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={signupStyles.safe}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
-          contentContainerStyle={styles.scroll}
+          contentContainerStyle={signupStyles.scroll}
           keyboardShouldPersistTaps="handled"
         >
-          <Header style={styles.header}>
+          <Header style={signupStyles.header}>
             <TouchableOpacity
-              style={styles.backBtn}
+              style={signupStyles.backBtn}
               onPress={() => navigation.goBack()}
             >
               <Ionicons name="arrow-back" size={20} color="#fff" />
             </TouchableOpacity>
 
-            <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Join us today</Text>
+            <Text style={signupStyles.title}>Create Account</Text>
+            <Text style={signupStyles.subtitle}>Join us today</Text>
           </Header>
 
-          <View style={styles.card}>
+          <View style={signupStyles.card}>
             {/* Inputs unchanged */}
             <InputField label="First Name" required icon="person-outline" placeholder="Enter first name"
               value={form.first} onChangeText={(v) => handleChange('first', v)} error={errors.first} />
@@ -158,7 +158,7 @@ export default function SignupScreen({ navigation }) {
 
             {otpVisible && (
               <>
-                <View style={styles.otpBox}>
+                <View style={signupStyles.otpBox}>
                   <TextInput
                     placeholder="Enter OTP"
                     keyboardType="number-pad"
@@ -169,7 +169,7 @@ export default function SignupScreen({ navigation }) {
                 </View>
 
                 <TouchableOpacity onPress={() => setTimer(30)} disabled={timer > 0}>
-                  <Text style={styles.resend}>
+                  <Text style={signupStyles.resend}>
                     {timer > 0 ? `Resend OTP in ${timer}s` : 'Resend OTP'}
                   </Text>
                 </TouchableOpacity>
@@ -187,15 +187,3 @@ export default function SignupScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.background },
-  scroll: { flexGrow: 1, paddingBottom: 40 },
-  header: { height: 230, justifyContent: 'center', alignItems: 'center', borderBottomLeftRadius: 50, borderBottomRightRadius: 50 },
-  backBtn: { position: 'absolute', left: 20, top: 55, backgroundColor: 'rgba(255,255,255,0.2)', padding: 10, borderRadius: 30 },
-  title: { color: '#fff', fontSize: 26, fontWeight: '700' },
-  subtitle: { color: '#fff', marginTop: 6 },
-  card: { backgroundColor: COLORS.card, marginHorizontal: 20, marginTop: -55, borderRadius: 28, padding: 22, elevation: 6 },
-  otpBox: { borderWidth: 2, borderColor: COLORS.accent, borderRadius: 22, height: 58, justifyContent: 'center', paddingHorizontal: 14, marginTop: 15 },
-  resend: { textAlign: 'center', marginTop: 10, color: COLORS.accent, fontWeight: '600' },
-});

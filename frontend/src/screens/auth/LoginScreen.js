@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -16,6 +15,7 @@ import Header from '../../components/common/Header';
 import InputField from '../../components/form/InputField';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
 import { COLORS } from '../../styles/colors';
+import { loginStyles } from '../../styles/loginStyles';
 
 const { width } = Dimensions.get('window');
 
@@ -93,23 +93,23 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={loginStyles.safe}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={loginStyles.container}>
           <View style={{ flex: 1 }}>
 
-            <Header style={styles.header}>
-              <View style={styles.iconWrap}>
-                <Text style={styles.icon}>💼</Text>
+            <Header style={loginStyles.header}>
+              <View style={loginStyles.iconWrap}>
+                <Text style={loginStyles.icon}>💼</Text>
               </View>
-              <Text style={styles.appTitle}>Digital Business Card</Text>
-              <Text style={styles.subtitle}>Grow your business digitally</Text>
+              <Text style={loginStyles.appTitle}>Digital Business Card</Text>
+              <Text style={loginStyles.subtitle}>Grow your business digitally</Text>
             </Header>
 
-            <View style={styles.card}>
+            <View style={loginStyles.card}>
               <InputField
                 placeholder="Enter mobile number"
                 value={phone}
@@ -128,12 +128,12 @@ export default function LoginScreen({ navigation }) {
 
               {otpSent && (
                 <>
-                  <View style={styles.otpRow}>
+                  <View style={loginStyles.otpRow}>
                     {otp.map((d, i) => (
                       <TextInput
                         key={i}
                         ref={(r) => (inputs.current[i] = r)}
-                        style={styles.otpBox}
+                        style={loginStyles.otpBox}
                         keyboardType="number-pad"
                         maxLength={1}
                         value={d}
@@ -165,9 +165,9 @@ export default function LoginScreen({ navigation }) {
                   <TouchableOpacity
                     onPress={handleResendOtp}
                     disabled={!canResend}
-                    style={styles.resendWrap}
+                    style={loginStyles.resendWrap}
                   >
-                    <Text style={styles.resendText}>
+                    <Text style={loginStyles.resendText}>
                       {canResend
                         ? 'Resend OTP'
                         : `Resend OTP in ${timer}s`}
@@ -178,22 +178,22 @@ export default function LoginScreen({ navigation }) {
               <PrimaryButton
                 title="Login"
                 onPress={handleLogin}
-                style={styles.loginBtn}
+                style={loginStyles.loginBtn}
               />
 
 
-              <View style={styles.dividerRow}>
-                <View style={styles.line} />
-                <Text style={styles.newHereText}>New here?</Text>
-                <View style={styles.line} />
+              <View style={loginStyles.dividerRow}>
+                <View style={loginStyles.line} />
+                <Text style={loginStyles.newHereText}>New here?</Text>
+                <View style={loginStyles.line} />
               </View>
 
               <TouchableOpacity
-                style={styles.signupRow}
+                style={loginStyles.signupRow}
                 onPress={() => navigation.navigate('Signup')}
               >
-                <Text style={styles.createText}>Create your account </Text>
-                <Text style={styles.signupText}>Sign Up →</Text>
+                <Text style={loginStyles.createText}>Create your account </Text>
+                <Text style={loginStyles.signupText}>Sign Up →</Text>
               </TouchableOpacity>
             </View>
 
@@ -203,106 +203,3 @@ export default function LoginScreen({ navigation }) {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.background },
-  container: { flexGrow: 1 },
-
-  header: {
-    height: 240,
-    paddingHorizontal: 20,
-    paddingTop: 30,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
-  },
-
-  iconWrap: {
-    backgroundColor: 'rgba(255,255,255,0.85)',
-    padding: 14,
-    borderRadius: 40,
-    marginBottom: 12,
-  },
-  icon: { fontSize: 28 },
-  appTitle: { color: '#FFF', fontSize: 22, fontWeight: '700' },
-  subtitle: {
-    color: 'rgba(255,255,255,0.85)',
-    marginTop: 4,
-    fontSize: 13,
-  },
-
-  card: {
-    backgroundColor: COLORS.card,
-    marginHorizontal: 20,
-    marginTop: -30,
-    borderRadius: 16,
-    padding: 18,
-    elevation: 3,
-  },
-
-  otpRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 18,
-  },
-  otpBox: {
-    width: width / 8,
-    height: 48,
-    borderWidth: 2,
-    borderColor: COLORS.accent,
-    borderRadius: 10,
-    textAlign: 'center',
-    fontSize: 20,
-    color: COLORS.text,
-    fontWeight: '700',
-  },
-  resendWrap: {
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  resendText: {
-    color: COLORS.accent,
-    fontWeight: '700',
-    textDecorationLine: 'underline',
-  },
-
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 24,
-    marginBottom: 10,
-  },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: COLORS.accent,
-  },
-  newHereText: {
-    marginHorizontal: 12,
-    color: COLORS.text,
-    fontSize: 13,
-    fontWeight: '500',
-  },
-
-  signupRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  createText: {
-    color: COLORS.text,
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  signupText: {
-    color: COLORS.accent,
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  loginBtn: {
-  backgroundColor: COLORS.accent,
-  marginTop: 10,
-},
-
-});
