@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../styles/colors';
 
 export default function InputField({
   label,
@@ -19,7 +20,7 @@ export default function InputField({
       {/* LABEL ROW */}
       <View style={styles.labelRow}>
         <View style={styles.left}>
-          <Ionicons name={icon} size={17} color="#6b0f1a" />
+          <Ionicons name={icon} size={17} color={COLORS.accent} />
           <Text style={styles.label}>
             {'  '}
             {label}
@@ -34,7 +35,7 @@ export default function InputField({
       <View
         style={[
           styles.inputBox,
-          error && { borderColor: '#DC2626' },
+          error && { borderColor: '#FF0000' },
         ]}
       >
         {showCountry && (
@@ -77,18 +78,19 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#374151',
+    color: COLORS.text,
   },
 
   star: {
-    color: '#DC2626',
+    color: '#FF0000',
     fontWeight: '700',
+    fontSize: 16,
   },
 
   error: {
-    color: '#DC2626',
-    fontSize: 12,
-    fontWeight: '500',
+    color: '#FF0000',
+    fontSize: 13,
+    fontWeight: '600',
   },
 
   // ---------- INPUT ----------
@@ -96,22 +98,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     height: 58,
-    borderWidth: 1.8,
-    borderColor: '#E5E7EB',
+    borderWidth: 2,
+    borderColor: COLORS.accent,
     borderRadius: 22,
     paddingHorizontal: 14,
     backgroundColor: '#FFFFFF',
 
     // premium shadow
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowColor: COLORS.accent,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
 
   // +91 pill
   countryPill: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -120,15 +122,15 @@ const styles = StyleSheet.create({
 
   countryText: {
     fontWeight: '600',
-    color: '#111827',
+    color: COLORS.accent,
   },
 
   // 🔥 MOST IMPORTANT PART (fixes invisible typing)
   input: {
     flex: 1,
     fontSize: 16,
-    color: '#111827',
+    color: COLORS.text,
     paddingVertical: 0,
   },
 });
-//raghu
+

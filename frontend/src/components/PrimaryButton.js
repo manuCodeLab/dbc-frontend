@@ -24,22 +24,24 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   filled: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.accent,
   },
   outlined: {
     backgroundColor: '#FFF',
-    borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderWidth: 2,
+    borderColor: COLORS.accent,
   },
   title: {
     fontSize: 16,
     fontWeight: '600',
   },
   titleFilled: {
-    color: '#FFFFFF',
+    color: COLORS.primary,
+    fontWeight: '700',
   },
   titleOutlined: {
-    color: COLORS.primary,
+    color: COLORS.accent,
+    fontWeight: '700',
   },
 });
 

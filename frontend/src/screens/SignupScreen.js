@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import HeaderGradient from '../components/HeaderGradient';
 import InputField from '../components/InputField';
 import PrimaryButton from '../components/PrimaryButton';
+import { COLORS } from '../styles/colors';
 
 export default function SignupScreen({ navigation }) {
   const [otpVisible, setOtpVisible] = useState(false);
@@ -188,13 +189,13 @@ export default function SignupScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#f8f9fb' },
+  safe: { flex: 1, backgroundColor: COLORS.background },
   scroll: { flexGrow: 1, paddingBottom: 40 },
   header: { height: 230, justifyContent: 'center', alignItems: 'center', borderBottomLeftRadius: 50, borderBottomRightRadius: 50 },
   backBtn: { position: 'absolute', left: 20, top: 55, backgroundColor: 'rgba(255,255,255,0.2)', padding: 10, borderRadius: 30 },
   title: { color: '#fff', fontSize: 26, fontWeight: '700' },
   subtitle: { color: '#fff', marginTop: 6 },
-  card: { backgroundColor: '#fff', marginHorizontal: 20, marginTop: -55, borderRadius: 28, padding: 22, elevation: 6 },
-  otpBox: { borderWidth: 2, borderColor: '#6b0f1a', borderRadius: 22, height: 58, justifyContent: 'center', paddingHorizontal: 14, marginTop: 15 },
-  resend: { textAlign: 'center', marginTop: 10, color: '#6b0f1a', fontWeight: '600' },
+  card: { backgroundColor: COLORS.card, marginHorizontal: 20, marginTop: -55, borderRadius: 28, padding: 22, elevation: 6 },
+  otpBox: { borderWidth: 2, borderColor: COLORS.accent, borderRadius: 22, height: 58, justifyContent: 'center', paddingHorizontal: 14, marginTop: 15 },
+  resend: { textAlign: 'center', marginTop: 10, color: COLORS.accent, fontWeight: '600' },
 });

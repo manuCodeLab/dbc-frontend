@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
+import { COLORS } from '../styles/colors';
 
 export default function SplashScreen({ navigation }) {
   useEffect(() => {
@@ -30,23 +31,36 @@ export default function SplashScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#6b0f1a', // burgundy
+    backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
-  
+  circle: {
+    backgroundColor: COLORS.accent,
+    width: 280,
+    height: 280,
+    borderRadius: 140,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 40,
+    shadowColor: COLORS.accent,
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+
   logo: {
     width: 250,
     height: 250,
   },
 
   subtitle: {
-  color: '#f3dcdc',
-  marginTop: 8,
-  fontSize: 20,
-  fontWeight: '600',
-  letterSpacing: 0.5,
-},
+    color: COLORS.accent,
+    marginTop: 8,
+    fontSize: 20,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
 
 });

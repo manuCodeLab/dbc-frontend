@@ -6,14 +6,14 @@ import { COLORS } from '../styles/colors';
 const HeaderGradient = ({ children, style }) => {
   if (Platform.OS === 'web') {
     return (
-      <View style={[{ backgroundImage: 'linear-gradient(180deg, #7A0019 0%, #4a0012 100%)' }, style]}>
+      <View style={[{ backgroundImage: 'linear-gradient(180deg, #0F0F0F 0%, #1A1A1A 100%)' }, style]}>
         {children}
       </View>
     );
   }
 
   return (
-    <LinearGradient colors={[COLORS.primary, '#4a0012']} style={style}>
+    <LinearGradient colors={[COLORS.primary, '#1A1A1A']} style={style}>
       {children}
     </LinearGradient>
   );
