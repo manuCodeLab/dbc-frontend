@@ -44,8 +44,8 @@ export default function DashboardScreen({ navigation }) {
       <View style={layoutStyles.headerSection}>
         {/* Back Button */}
         <TouchableOpacity 
-          style={layoutStyles.backButton}
           onPress={navigateToLanding}
+          style={{ width: 24, justifyContent: 'center', alignItems: 'center' }}
         >
           <Ionicons name="chevron-back" size={28} color="#D4AF37" />
         </TouchableOpacity>
