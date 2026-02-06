@@ -59,7 +59,7 @@ export default function LandingScreen({ navigation }) {
           <View style={landingStyles.featureContent}>
             <Text style={landingStyles.featureCardTitle}>Quick Setup</Text>
             <Text style={landingStyles.featureCardText}>
-              Create your card in just 2 simple steps
+              Create your card in just 3 simple steps
             </Text>
           </View>
         </View>
@@ -123,7 +123,7 @@ export default function LandingScreen({ navigation }) {
       {/* ========== INFO SECTION ========== */}
       <View style={landingStyles.infoSection}>
         <View style={landingStyles.infoCard}>
-          <Text style={landingStyles.infoNumber}>2</Text>
+          <Text style={landingStyles.infoNumber}>3</Text>
           <Text style={landingStyles.infoLabel}>Simple Steps</Text>
         </View>
         <View style={landingStyles.infoCard}>

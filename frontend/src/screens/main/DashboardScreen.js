@@ -86,7 +86,7 @@ export default function DashboardScreen({ navigation }) {
         
         {/* Profile Information Header */}
         <View style={layoutStyles.cardHeader}>
-          <Text style={layoutStyles.cardTitle}>Profile Information</Text>
+          <Text style={layoutStyles.cardTitle}>Step 1 of 3</Text>
           <Text style={layoutStyles.cardSubtitle}>
             All fields marked with * are mandatory
           </Text>

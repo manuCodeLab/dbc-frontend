@@ -82,7 +82,7 @@ export default function BusinessDetailsScreen({ navigation }) {
         
         {/* Card Header */}
         <View style={layoutStyles.cardHeader}>
-          <Text style={layoutStyles.cardTitle}>Company Details</Text>
+          <Text style={layoutStyles.cardTitle}>Step 2 of 3</Text>
           <Text style={layoutStyles.cardSubtitle}>
             All fields marked with * are mandatory
           </Text>
