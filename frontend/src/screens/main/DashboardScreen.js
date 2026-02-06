@@ -47,7 +47,7 @@ export default function DashboardScreen({ navigation }) {
           style={layoutStyles.backButton}
           onPress={navigateToLanding}
         >
-          <Ionicons name="arrow-back" size={24} color="#D4AF37" />
+          <Ionicons name="chevron-back" size={28} color="#D4AF37" />
         </TouchableOpacity>
 
         {/* App Title */}

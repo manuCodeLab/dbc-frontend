@@ -229,27 +229,11 @@ export default function ProfileScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* Action Buttons */}
-      <View style={profileStyles.buttonContainer}>
-        <TouchableOpacity 
-          style={profileStyles.saveButton}
-          onPress={() => navigation.navigate('BusinessDetails')}
-        >
-          <Ionicons name="checkmark-done" size={18} color={COLORS.primary} />
-          <Text style={profileStyles.saveButtonText}>Step 2: Business Info</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={profileStyles.cancelButton}
-          onPress={navigateToLanding}
-        >
-          <Ionicons name="arrow-back" size={18} color={COLORS.accent} />
-          <Text style={profileStyles.cancelButtonText}>Go Back</Text>
-        </TouchableOpacity>
-      </View>
-
       {/* Logout Button */}
-      <TouchableOpacity style={profileStyles.logoutButton}>
+      <TouchableOpacity 
+        style={profileStyles.logoutButton}
+        onPress={() => navigation.replace('Login')}
+      >
         <Ionicons name="log-out" size={18} color="#FF0000" />
         <Text style={profileStyles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
@@ -258,3 +242,4 @@ export default function ProfileScreen({ navigation }) {
     </ScrollView>
   );
 }
+
