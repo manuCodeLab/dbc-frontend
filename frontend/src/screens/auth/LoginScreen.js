@@ -85,7 +85,7 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = () => {
     if (otp.join('') === '123456') {
       Alert.alert('Success 🎉', 'OTP Verified');
-      navigation.replace('Dashboard');
+      navigation.replace('Landing');
     } else {
       Alert.alert('Wrong OTP ❌', 'Enter 123456');
       resetOtpBoxes();

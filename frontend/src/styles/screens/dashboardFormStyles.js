@@ -45,6 +45,31 @@ export const formStyles = StyleSheet.create({
     textAlignVertical: 'top',
   },
 
+  // Address input specific styles
+  addressInputContainer: {
+    height: 120,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+
+  addressInput: {
+    flex: 1,
+    fontSize: 14,
+    color: '#0F0F0F',
+    paddingVertical: 8,
+    paddingHorizontal: 0,
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
+
+  addressIcon: {
+    marginRight: 12,
+    marginTop: 8,
+  },
+
   inputFocused: {
     borderColor: '#D4AF37',
     borderWidth: 2,

@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 
+// ========== LAYOUT STYLES ==========
 export const layoutStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -13,7 +14,7 @@ export const layoutStyles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 3,
@@ -25,39 +26,23 @@ export const layoutStyles = StyleSheet.create({
     elevation: 4,
   },
 
-  logoBox: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    backgroundColor: '#0F0F0F',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#D4AF37',
-  },
-
   backButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    backgroundColor: '#0F0F0F',
+    padding: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#D4AF37',
   },
 
   appTitle: {
     color: '#0F0F0F',
-    fontSize: 11,
+    fontSize: 14,
     fontWeight: '700',
-    letterSpacing: 2.5,
+    letterSpacing: 2,
     maxWidth: 120,
     textAlign: 'center',
     flex: 1,
   },
 
-  profileIcon: {
+  stepIndicator: {
     width: 50,
     height: 50,
     borderRadius: 25,
@@ -73,9 +58,9 @@ export const layoutStyles = StyleSheet.create({
     elevation: 3,
   },
 
-  profileIconText: {
+  stepText: {
     color: '#0F0F0F',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
   },
 
@@ -151,11 +136,61 @@ export const layoutStyles = StyleSheet.create({
     marginBottom: 16,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
-    paddingBottomWidth: 2,
-    paddingBottomColor: '#D4AF37',
   },
 
-  // ========== SAVE BUTTON ==========
+  // ========== UPLOAD BOX ==========
+  uploadBox: {
+    borderWidth: 2,
+    borderColor: '#D4AF37',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    marginBottom: 16,
+    backgroundColor: '#F9FAFB',
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  uploadContent: {
+    alignItems: 'center',
+  },
+
+  uploadLabel: {
+    color: '#0F0F0F',
+    fontSize: 14,
+    fontWeight: '700',
+    marginTop: 12,
+    marginBottom: 4,
+  },
+
+  uploadHint: {
+    color: '#9CA3AF',
+    fontSize: 12,
+    fontWeight: '400',
+  },
+
+  uploadedImage: {
+    marginTop: 12,
+    width: '100%',
+    height: 120,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#E5E7EB',
+  },
+
+  uploadedImagePreview: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
+
+  // ========== BUTTON GROUP ==========
+  buttonGroup: {
+    gap: 12,
+    marginTop: 24,
+  },
+
   saveButton: {
     flexDirection: 'row',
     backgroundColor: '#D4AF37',
@@ -163,7 +198,6 @@ export const layoutStyles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
     borderWidth: 2,
     borderColor: '#0F0F0F',
     shadowColor: '#D4AF37',
@@ -182,34 +216,6 @@ export const layoutStyles = StyleSheet.create({
     marginLeft: 8,
   },
 
-  // ========== NEXT BUTTON (Step Navigation) ==========
-  nextButton: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 14,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 12,
-    borderWidth: 2,
-    borderColor: '#D4AF37',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-
-  nextButtonText: {
-    color: '#0F0F0F',
-    fontSize: 14,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginRight: 8,
-  },
-
-  // ========== SKIP/GO BACK BUTTON ==========
   skipButton: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
@@ -217,60 +223,83 @@ export const layoutStyles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 12,
     borderWidth: 2,
     borderColor: '#D4AF37',
   },
 
   skipButtonText: {
     color: '#D4AF37',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     marginLeft: 8,
   },
+});
 
-  // Old styles for backward compatibility
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-    paddingHorizontal: 8,
+// ========== FORM STYLES ==========
+export const formStyles = StyleSheet.create({
+  // Input wrapper
+  inputWrapper: {
+    marginBottom: 18,
   },
 
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-
-  submitButton: {
-    backgroundColor: '#D4AF37',
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 24,
-    shadowColor: '#D4AF37',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-
-  submitButtonText: {
+  label: {
     color: '#0F0F0F',
-    fontSize: 15,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 8,
+    letterSpacing: 0.3,
+  },
+
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#F9FAFB',
+    height: 50,
+  },
+
+  inputIcon: {
+    marginRight: 10,
+    color: '#D4AF37',
+  },
+
+  // Input field
+  input: {
+    flex: 1,
+    fontSize: 14,
+    color: '#0F0F0F',
+    paddingVertical: 12,
+    paddingHorizontal: 0,
+  },
+
+  inputFocused: {
+    borderColor: '#D4AF37',
+    borderWidth: 2,
+  },
+
+  inputFieldError: {
+    borderColor: '#FF0000',
+  },
+
+  // Error message
+  errorMessage: {
+    color: '#FF0000',
+    fontSize: 12,
+    fontWeight: '500',
+    marginTop: 4,
+  },
+
+  // Helper text
+  helperText: {
+    color: '#9CA3AF',
+    fontSize: 12,
+    fontWeight: '400',
+    marginTop: 4,
   },
 });
 

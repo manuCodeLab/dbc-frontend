@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { profileStyles } from '../../styles/screens/profileStyles';
 import { COLORS } from '../../styles/colors';
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }) {
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
     name: 'Nandu Kumar',
@@ -41,10 +41,21 @@ export default function ProfileScreen() {
     setIsEditing(false);
   };
 
+  const navigateToLanding = () => {
+    navigation.navigate('Landing');
+  };
+
   return (
     <ScrollView style={profileStyles.container}>
       {/* Header */}
       <View style={profileStyles.header}>
+        <TouchableOpacity 
+          onPress={navigateToLanding}
+          style={{ width: 24, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Ionicons name="arrow-back" size={24} color={COLORS.accent} />
+        </TouchableOpacity>
+        <Text style={profileStyles.headerTitle}>My Profile</Text>
         <TouchableOpacity onPress={() => setIsEditing(!isEditing)}>
           <Ionicons 
             name={isEditing ? 'close' : 'create'} 
@@ -52,8 +63,6 @@ export default function ProfileScreen() {
             color={COLORS.accent} 
           />
         </TouchableOpacity>
-        <Text style={profileStyles.headerTitle}>My Profile</Text>
-        <View style={{ width: 24 }} />
       </View>
 
       {/* Profile Avatar */}
@@ -190,13 +199,6 @@ export default function ProfileScreen() {
       {isEditing && (
         <View style={profileStyles.buttonContainer}>
           <TouchableOpacity 
-            style={profileStyles.saveButton}
-            onPress={handleSave}
-          >
-            <Ionicons name="checkmark" size={18} color={COLORS.primary} />
-            <Text style={profileStyles.saveButtonText}>Save Changes</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
             style={profileStyles.cancelButton}
             onPress={handleCancel}
           >
@@ -224,6 +226,25 @@ export default function ProfileScreen() {
           <Ionicons name="settings" size={20} color={COLORS.accent} />
           <Text style={profileStyles.optionText}>Settings</Text>
           <Ionicons name="chevron-forward" size={20} color="#CCCCCC" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Action Buttons */}
+      <View style={profileStyles.buttonContainer}>
+        <TouchableOpacity 
+          style={profileStyles.saveButton}
+          onPress={() => navigation.navigate('BusinessDetails')}
+        >
+          <Ionicons name="checkmark-done" size={18} color={COLORS.primary} />
+          <Text style={profileStyles.saveButtonText}>Step 2: Business Info</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={profileStyles.cancelButton}
+          onPress={navigateToLanding}
+        >
+          <Ionicons name="arrow-back" size={18} color={COLORS.accent} />
+          <Text style={profileStyles.cancelButtonText}>Go Back</Text>
         </TouchableOpacity>
       </View>
 
