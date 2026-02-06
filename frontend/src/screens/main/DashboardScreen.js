@@ -2,138 +2,137 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
+  TextInput,
   ScrollView,
-  Alert,
+  TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../../styles/colors';
-import { dashboardStyles } from '../../styles/screens/dashboardStyles';
 
-export default function DashboardScreen({ navigation }) {
-  const [userName] = useState('Nandu Kumar');
-  const [cardShares] = useState(245);
-  const [views] = useState(1250);
+import { layoutStyles } from '../../styles/screens/dashboardLayoutStyles';
+import { formStyles } from '../../styles/screens/dashboardFormStyles';
 
-  const handleCardAction = (action) => {
-    Alert.alert(`${action}`, 'Feature coming soon!');
-  };
+export default function DashboardScreen() {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    designation: '',
+    phone1: '',
+    phone2: '',
+    email: '',
+    address: '',
+  });
 
   return (
-    <SafeAreaView style={dashboardStyles.safe}>
-      <ScrollView
-        contentContainerStyle={dashboardStyles.container}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* PREMIUM HEADER */}
-        <View style={dashboardStyles.header}>
-          <View style={dashboardStyles.profileSection}>
-            <View style={dashboardStyles.avatarContainer}>
-              <Text style={dashboardStyles.avatarText}>NK</Text>
-            </View>
-            <View style={dashboardStyles.profileInfo}>
-              <Text style={dashboardStyles.greeting}>Welcome Back!</Text>
-              <Text style={dashboardStyles.userName}>{userName}</Text>
-            </View>
-            <TouchableOpacity style={dashboardStyles.settingsBtn}>
-              <Ionicons name="settings-outline" size={24} color={COLORS.accent} />
-            </TouchableOpacity>
-          </View>
+    <ScrollView style={layoutStyles.container}>
+      
+      {/* Header */}
+      <View style={layoutStyles.header}>
+        <View style={layoutStyles.logoBox}>
+          <Ionicons name="document" size={28} color="#FFFFFF" />
         </View>
-
-        {/* STATS SECTION */}
-        <View style={dashboardStyles.statsContainer}>
-          <View style={dashboardStyles.statCard}>
-            <View style={dashboardStyles.statIconWrapper}>
-              <Ionicons name="eye" size={20} color={COLORS.accent} />
-            </View>
-            <Text style={dashboardStyles.statValue}>{views}</Text>
-            <Text style={dashboardStyles.statLabel}>Profile Views</Text>
-          </View>
-          <View style={dashboardStyles.statCard}>
-            <View style={dashboardStyles.statIconWrapper}>
-              <Ionicons name="share-social" size={20} color={COLORS.accent} />
-            </View>
-            <Text style={dashboardStyles.statValue}>{cardShares}</Text>
-            <Text style={dashboardStyles.statLabel}>Card Shares</Text>
-          </View>
+        <Text style={layoutStyles.headerTitle}>
+          DIGITAL BUSINESS CARD
+        </Text>
+        <View style={layoutStyles.profileCircle}>
+          <Text style={layoutStyles.profileText}>N</Text>
         </View>
+      </View>
 
-        {/* MY DIGITAL CARD PREVIEW */}
-        <TouchableOpacity style={dashboardStyles.cardPreview}>
-          <View style={dashboardStyles.cardHeader}>
-            <Ionicons name="card" size={32} color={COLORS.accent} />
-            <Text style={dashboardStyles.cardPreviewTitle}>My Digital Card</Text>
-          </View>
-          <View style={dashboardStyles.cardDivider} />
-          <Text style={dashboardStyles.cardPreviewSubtitle}>{userName}</Text>
-          <Text style={dashboardStyles.cardPreviewRole}>Digital Entrepreneur</Text>
-          <View style={dashboardStyles.cardFooter}>
-            <Ionicons name="arrow-forward" size={20} color={COLORS.accent} />
-            <Text style={dashboardStyles.viewCardText}>View Full Card</Text>
-          </View>
-        </TouchableOpacity>
+      {/* Title */}
+      <Text style={layoutStyles.mainTitle}>
+        Digital Business Card Creator
+      </Text>
+      <Text style={layoutStyles.subtitle}>
+        Create your professional digital business card in minutes
+      </Text>
 
-        {/* QUICK ACTIONS GRID */}
-        <Text style={dashboardStyles.sectionTitle}>Quick Actions</Text>
-        <View style={dashboardStyles.grid}>
-          <ActionCard
-            title="Edit Profile"
-            icon="person-outline"
-            color={COLORS.accent}
-            onPress={() => handleCardAction('Edit Profile')}
-          />
-          <ActionCard
-            title="Share Card"
-            icon="share-social"
-            color={COLORS.accent}
-            onPress={() => handleCardAction('Share Card')}
-          />
-          <ActionCard
-            title="Analytics"
-            icon="bar-chart-outline"
-            color={COLORS.accent}
-            onPress={() => handleCardAction('Analytics')}
-          />
-          <ActionCard
-            title="Contacts"
-            icon="people-outline"
-            color={COLORS.accent}
-            onPress={() => handleCardAction('Contacts')}
-          />
-          <ActionCard
-            title="Templates"
-            icon="layers-outline"
-            color={COLORS.accent}
-            onPress={() => handleCardAction('Templates')}
-          />
-          <ActionCard
-            title="Settings"
-            icon="settings-outline"
-            color={COLORS.accent}
-            onPress={() => handleCardAction('Settings')}
-          />
-        </View>
+      {/* Card */}
+      <View style={layoutStyles.card}>
+        <Text style={layoutStyles.cardTitle}>Profile Information</Text>
+        <Text style={layoutStyles.cardSubtitle}>
+          All fields marked with * are mandatory
+        </Text>
 
-        {/* LOGOUT BUTTON */}
-        <TouchableOpacity
-          style={dashboardStyles.logoutBtn}
-          onPress={() => navigation.replace('Splash')}
-        >
-          <Ionicons name="log-out-outline" size={20} color={COLORS.primary} />
-          <Text style={dashboardStyles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+        <Text style={layoutStyles.sectionTitle}>Personal Details</Text>
+
+        <Input 
+          label="Full Name *" 
+          placeholder="Enter full name"
+          icon="person"
+          value={formData.fullName}
+          onChangeText={(text) => setFormData({...formData, fullName: text})}
+        />
+        <Input 
+          label="Designation *" 
+          placeholder="Enter designation"
+          icon="briefcase"
+          value={formData.designation}
+          onChangeText={(text) => setFormData({...formData, designation: text})}
+        />
+        <Input 
+          label="Phone Number *" 
+          placeholder="10-digit phone number"
+          icon="call"
+          keyboardType="phone-pad"
+          value={formData.phone1}
+          onChangeText={(text) => setFormData({...formData, phone1: text})}
+        />
+        <Input 
+          label="Phone Number 2 (Optional)" 
+          placeholder="Alternate number"
+          icon="call"
+          keyboardType="phone-pad"
+          value={formData.phone2}
+          onChangeText={(text) => setFormData({...formData, phone2: text})}
+        />
+        <Input 
+          label="Email *" 
+          placeholder="your.email@gmail.com"
+          icon="mail"
+          keyboardType="email-address"
+          value={formData.email}
+          onChangeText={(text) => setFormData({...formData, email: text})}
+        />
+        <Input 
+          label="Address *" 
+          placeholder="Enter address"
+          icon="location"
+          multiline
+          value={formData.address}
+          onChangeText={(text) => setFormData({...formData, address: text})}
+        />
+      </View>
+
+      {/* Submit Button */}
+      <TouchableOpacity style={layoutStyles.submitButton}>
+        <Text style={layoutStyles.submitButtonText}>Create Card</Text>
+      </TouchableOpacity>
+
+      <View style={{ height: 30 }} />
+    </ScrollView>
   );
 }
 
-const ActionCard = ({ title, icon, color, onPress }) => (
-  <TouchableOpacity style={dashboardStyles.actionCard} onPress={onPress}>
-    <View style={[dashboardStyles.iconBox, { backgroundColor: color + '15' }]}>
-      <Ionicons name={icon} size={28} color={color} />
+function Input({ label, placeholder, icon, multiline, keyboardType, value, onChangeText }) {
+  return (
+    <View style={formStyles.inputWrapper}>
+      <Text style={formStyles.label}>
+        {label}
+      </Text>
+      <View style={formStyles.inputContainer}>
+        <Ionicons name={icon} size={20} color="#D4AF37" style={formStyles.inputIcon} />
+        <TextInput
+          style={[
+            formStyles.input,
+            multiline && formStyles.multilineInput
+          ]}
+          placeholder={placeholder}
+          placeholderTextColor="#A0AEC0"
+          multiline={multiline}
+          keyboardType={keyboardType}
+          value={value}
+          onChangeText={onChangeText}
+        />
+      </View>
     </View>
-    <Text style={dashboardStyles.actionCardText}>{title}</Text>
-  </TouchableOpacity>
-);
+  );
+}
