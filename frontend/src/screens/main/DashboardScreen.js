@@ -5,6 +5,8 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -38,7 +40,12 @@ export default function DashboardScreen({ navigation }) {
   };
 
   return (
-    <ScrollView style={layoutStyles.container}>
+    <SafeAreaView style={layoutStyles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 30 }}
+      >
       
       {/* ========== HEADER SECTION ========== */}
       <View style={layoutStyles.headerSection}>
@@ -168,7 +175,8 @@ export default function DashboardScreen({ navigation }) {
       </View>
 
       <View style={{ height: 30 }} />
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

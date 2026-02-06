@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   TextInput,
   StyleSheet,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { profileStyles } from '../../styles/screens/profileStyles';
@@ -46,7 +48,12 @@ export default function ProfileScreen({ navigation }) {
   };
 
   return (
-    <ScrollView style={profileStyles.container}>
+    <SafeAreaView style={profileStyles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 30 }}
+      >
       {/* Header */}
       <View style={profileStyles.header}>
         <TouchableOpacity 
@@ -239,7 +246,8 @@ export default function ProfileScreen({ navigation }) {
       </TouchableOpacity>
 
       <View style={{ height: 30 }} />
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

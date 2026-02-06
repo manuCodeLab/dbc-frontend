@@ -5,6 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { landingStyles } from '../../styles/screens/landingStyles';
@@ -19,7 +21,12 @@ export default function LandingScreen({ navigation }) {
   };
 
   return (
-    <ScrollView style={landingStyles.container}>
+    <SafeAreaView style={landingStyles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 30 }}
+      >
       {/* ========== HEADER SECTION ========== */}
       <View style={landingStyles.headerSection}>
         <View style={landingStyles.logoBox}>
@@ -137,6 +144,7 @@ export default function LandingScreen({ navigation }) {
       </View>
 
       <View style={{ height: 30 }} />
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
