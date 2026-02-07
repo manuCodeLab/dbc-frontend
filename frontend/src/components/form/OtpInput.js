@@ -1,10 +1,10 @@
 import React, { useRef } from 'react';
-import { View, TextInput, StyleSheet, Dimensions } from 'react-native';
+import { View, TextInput, StyleSheet, Dimensions, TouchableOpacity, Text } from 'react-native';
 import { COLORS } from '../../styles/colors';
 
 const { width } = Dimensions.get('window');
 
-const OtpInput = ({ length = 6, onChangeText, value = '' }) => {
+const OtpInput = ({ length = 6, onChangeText, value = '', rightButton }) => {
   const inputs = useRef([]);
 
   const handleChange = (text, index) => {
@@ -33,20 +33,31 @@ const OtpInput = ({ length = 6, onChangeText, value = '' }) => {
 
   return (
     <View style={styles.container}>
-      {Array(length)
-        .fill('')
-        .map((_, index) => (
-          <TextInput
-            key={index}
-            ref={(ref) => (inputs.current[index] = ref)}
-            style={styles.input}
-            keyboardType="number-pad"
-            maxLength={1}
-            value={value?.[index] || ''}
-            onChangeText={(text) => handleChange(text, index)}
-            onKeyPress={(e) => handleKeyPress(e, index)}
-          />
-        ))}
+      <View style={styles.inputsWrap}>
+        {Array(length)
+          .fill('')
+          .map((_, index) => (
+            <TextInput
+              key={index}
+              ref={(ref) => (inputs.current[index] = ref)}
+              style={styles.input}
+              keyboardType="number-pad"
+              maxLength={1}
+              value={value?.[index] || ''}
+              onChangeText={(text) => handleChange(text, index)}
+              onKeyPress={(e) => handleKeyPress(e, index)}
+            />
+          ))}
+      </View>
+      {rightButton ? (
+        <TouchableOpacity
+          style={[styles.verifyBtn, rightButton.disabled && { opacity: 0.5 }]}
+          onPress={rightButton.onPress}
+          disabled={rightButton.disabled}
+        >
+          <Text style={styles.verifyText}>{rightButton.label}</Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 };
@@ -57,6 +68,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 18,
   },
+  inputsWrap: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flex: 1,
+  },
   input: {
     width: width / 8,
     height: 48,
@@ -66,6 +82,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 20,
     color: COLORS.text,
+    fontWeight: '700',
+  },
+  verifyBtn: {
+    marginLeft: 12,
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 40,
+  },
+  verifyText: {
+    color: COLORS.accent,
     fontWeight: '700',
   },
 });

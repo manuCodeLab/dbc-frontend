@@ -2,15 +2,16 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../../styles/colors';
 
-const PrimaryButton = ({ title, onPress, variant = 'primary' }) => {
+const PrimaryButton = ({ title, onPress, variant = 'primary', disabled = false }) => {
   const filled = variant === 'primary';
   return (
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={onPress}
-      style={[styles.button, filled ? styles.filled : styles.outlined]}
+      disabled={disabled}
+      style={[styles.button, filled ? styles.filled : styles.outlined, disabled && styles.disabled]}
     >
-      <Text style={[styles.title, filled ? styles.titleFilled : styles.titleOutlined]}>{title}</Text>
+      <Text style={[styles.title, filled ? styles.titleFilled : styles.titleOutlined, disabled && styles.titleDisabled]}>{title}</Text>
     </TouchableOpacity>
   );
 };
@@ -31,6 +32,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: COLORS.accent,
   },
+  disabled: {
+    opacity: 0.5,
+  },
   title: {
     fontSize: 16,
     fontWeight: '600',
@@ -42,6 +46,9 @@ const styles = StyleSheet.create({
   titleOutlined: {
     color: COLORS.accent,
     fontWeight: '700',
+  },
+  titleDisabled: {
+    opacity: 0.7,
   },
 });
 

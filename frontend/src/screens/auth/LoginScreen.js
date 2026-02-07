@@ -45,10 +45,10 @@ export default function LoginScreen({ navigation }) {
 
   // Send OTP (Dummy)
   const handleSendOtp = () => {
-    if (!/^[6-9]\d{9}$/.test(phone)) {
+    if (!/^[1-9]\d{9}$/.test(phone)) {
       Alert.alert(
         'Invalid Number',
-        'Enter valid Indian mobile number (starts with 6-9)'
+        'Enter valid  mobile number (starts with 1-9)'
       );
       return;
     }

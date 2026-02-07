@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../styles/colors';
 
@@ -14,6 +14,7 @@ export default function InputField({
   countryCode,
   icon,
   error,
+  rightButton,
 }) {
   return (
     <View style={styles.wrapper}>
@@ -52,6 +53,18 @@ export default function InputField({
           value={value}
           onChangeText={onChangeText}
         />
+        {rightButton ? (
+          <TouchableOpacity
+            style={[
+              styles.rightBtn,
+              rightButton.disabled && { opacity: 0.5 },
+            ]}
+            onPress={rightButton.onPress}
+            disabled={rightButton.disabled}
+          >
+            <Text style={styles.rightBtnText}>{rightButton.label}</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
     </View>
   );
@@ -131,6 +144,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.text,
     paddingVertical: 0,
+  },
+  rightBtn: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginLeft: 10,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  rightBtnText: {
+    color: COLORS.accent,
+    fontWeight: '700',
+    fontSize: 13,
   },
 });
 // raghu
