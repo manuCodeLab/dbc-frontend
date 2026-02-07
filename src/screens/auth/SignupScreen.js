@@ -1,0 +1,339 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import Header from '../../components/common/Header';
+import InputField from '../../components/form/InputField';
+import OtpInput from '../../components/form/OtpInput';
+import PrimaryButton from '../../components/buttons/PrimaryButton';
+import { COLORS } from '../../styles/colors';
+import { signupStyles } from '../../styles/screens/signupStyles';
+
+export default function SignupScreen({ navigation }) {
+  const [otpVisiblePhone, setOtpVisiblePhone] = useState(false);
+  const [otpVisibleEmail, setOtpVisibleEmail] = useState(false);
+  const [timerPhone, setTimerPhone] = useState(30);
+  const [timerEmail, setTimerEmail] = useState(30);
+  const [otpPhoneVerified, setOtpPhoneVerified] = useState(false);
+  const [otpEmailVerified, setOtpEmailVerified] = useState(false);
+
+  const [form, setForm] = useState({
+    first: '',
+    middle: '',
+    last: '',
+    phone: '',
+    email: '',
+    otpPhone: '',
+    otpEmail: '',
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const validPhone = (v) => /^[6-9]\d{9}$/.test(v);
+  const validEmail = (v) => /^\S+@\S+\.\S+$/.test(v);
+
+  useEffect(() => {
+    let i;
+    if (otpVisiblePhone && timerPhone > 0) {
+      i = setInterval(() => setTimerPhone((t) => t - 1), 1000);
+    }
+    return () => clearInterval(i);
+  }, [otpVisiblePhone, timerPhone]);
+
+  useEffect(() => {
+    let i;
+    if (otpVisibleEmail && timerEmail > 0) {
+      i = setInterval(() => setTimerEmail((t) => t - 1), 1000);
+    }
+    return () => clearInterval(i);
+  }, [otpVisibleEmail, timerEmail]);
+
+  const validate = (name, value) => {
+    let msg = '';
+
+    if (name === 'first' && value.length < 2) msg = 'Enter valid first name';
+    if (name === 'middle' && value && value.length < 2) msg = 'Only letters allowed';
+    if (name === 'last' && value.length < 2) msg = 'Enter valid last name';
+    if (name === 'phone' && !validPhone(value)) msg = 'Enter valid 10 digit number';
+    if (name === 'email' && !validEmail(value)) msg = 'Enter valid email';
+    if (name === 'otpPhone' && value.length !== 4) msg = 'Enter 4 digit OTP';
+    if (name === 'otpEmail' && value.length !== 4) msg = 'Enter 4 digit OTP';
+
+    setErrors((p) => ({ ...p, [name]: msg }));
+  };
+
+  const handleChange = (name, value) => {
+    let clean = value;
+
+    if (name === 'first' || name === 'middle')
+      clean = value.replace(/[^A-Za-z]/g, '').slice(0, 15);
+
+    if (name === 'last') {
+      clean = value.replace(/[^A-Za-z ]/g, '');
+      if ((clean.match(/ /g) || []).length > 1) return;
+      clean = clean.slice(0, 10);
+    }
+
+    if (name === 'phone')
+      clean = value.replace(/\D/g, '').slice(0, 10);
+
+    if (name === 'otpPhone' || name === 'otpEmail')
+      clean = value.replace(/\D/g, '').slice(0, 4);
+
+    setForm((p) => ({ ...p, [name]: clean }));
+    validate(name, clean);
+    if (name === 'otpPhone') setOtpPhoneVerified(false);
+    if (name === 'otpEmail') setOtpEmailVerified(false);
+  };
+
+  const formValid =
+    form.first.length >= 2 &&
+    form.last.length >= 2 &&
+    validPhone(form.phone) &&
+    validEmail(form.email) &&
+    !errors.first &&
+    !errors.last &&
+    !errors.phone &&
+    !errors.email;
+
+  const phoneValid = validPhone(form.phone) && !errors.phone;
+  const emailValid = validEmail(form.email) && !errors.email;
+
+  const canSubmit =
+    form.first.length >= 2 &&
+    form.last.length >= 2 &&
+    phoneValid &&
+    emailValid &&
+    form.otpPhone.length === 4 &&
+    form.otpEmail.length === 4 &&
+    !errors.first &&
+    !errors.last &&
+    !errors.phone &&
+    !errors.email &&
+    otpPhoneVerified &&
+    otpEmailVerified;
+
+  const handleValidateOtpPhone = () => {
+    if (!phoneValid) {
+      Alert.alert('Error', 'Enter a valid phone number');
+      return;
+    }
+    setOtpPhoneVerified(false);
+    Alert.alert('Phone OTP', 'Your phone OTP is 1111');
+    setOtpVisiblePhone(true);
+    setTimerPhone(30);
+  };
+
+  const handleValidateOtpEmail = () => {
+    if (!emailValid) {
+      Alert.alert('Error', 'Enter a valid email');
+      return;
+    }
+    setOtpEmailVerified(false);
+    Alert.alert('Email OTP', 'Your email OTP is 2222');
+    setOtpVisibleEmail(true);
+    setTimerEmail(30);
+  };
+
+  const handleResendPhoneOtp = () => {
+    if (otpPhoneVerified) return;
+    if (!phoneValid) {
+      Alert.alert('Error', 'Enter a valid phone number');
+      return;
+    }
+    setOtpPhoneVerified(false);
+    Alert.alert('Phone OTP', 'Your phone OTP is 1111');
+    setOtpVisiblePhone(true);
+    setTimerPhone(30);
+  };
+
+  const handleResendEmailOtp = () => {
+    if (otpEmailVerified) return;
+    if (!emailValid) {
+      Alert.alert('Error', 'Enter a valid email');
+      return;
+    }
+    setOtpEmailVerified(false);
+    Alert.alert('Email OTP', 'Your email OTP is 2222');
+    setOtpVisibleEmail(true);
+    setTimerEmail(30);
+  };
+
+  const handleVerifyPhoneOtp = () => {
+    if (form.otpPhone === '1111') {
+      setOtpPhoneVerified(true);
+      Alert.alert('Verified', 'Phone OTP verified');
+    } else {
+      setOtpPhoneVerified(false);
+      Alert.alert('Invalid', 'Phone OTP is incorrect');
+    }
+  };
+
+  const handleVerifyEmailOtp = () => {
+    if (form.otpEmail === '2222') {
+      setOtpEmailVerified(true);
+      Alert.alert('Verified', 'Email OTP verified');
+    } else {
+      setOtpEmailVerified(false);
+      Alert.alert('Invalid', 'Email OTP is incorrect');
+    }
+  };
+
+  // ✅ UPDATED HERE
+  const handleSubmit = () => {
+    if (form.otpPhone === '1111' && form.otpEmail === '2222') {
+      Alert.alert('Success', 'Account Created', [
+        {
+          text: 'OK',
+          onPress: () => navigation.replace('Login'),
+        },
+      ]);
+    } else {
+      Alert.alert('Wrong OTP', 'Try again');
+      setForm((p) => ({ ...p, otpPhone: '', otpEmail: '' }));
+    }
+  };
+
+  return (
+    <SafeAreaView style={signupStyles.safe}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          contentContainerStyle={[{ flexGrow: 1 }, signupStyles.scroll]}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+          showsVerticalScrollIndicator={false}
+        >
+          <Header style={signupStyles.header}>
+            <TouchableOpacity
+              style={signupStyles.backBtn}
+              onPress={() => navigation.goBack()}
+            >
+              <Ionicons name="arrow-back" size={20} color="#fff" />
+            </TouchableOpacity>
+
+            <Text style={signupStyles.title}>Create Account</Text>
+            <Text style={signupStyles.subtitle}>Join us today</Text>
+          </Header>
+
+          <View style={signupStyles.card}>
+            {/* Inputs unchanged */}
+            <InputField label="First Name" required icon="person-outline" placeholder="Enter first name"
+              value={form.first} onChangeText={(v) => handleChange('first', v)} error={errors.first} />
+
+            <InputField label="Middle Name (optional)" icon="person-outline" placeholder="Enter middle name"
+              value={form.middle} onChangeText={(v) => handleChange('middle', v)} error={errors.middle} />
+
+            <InputField label="Last Name" required icon="person-outline" placeholder="Enter last name"
+              value={form.last} onChangeText={(v) => handleChange('last', v)} error={errors.last} />
+
+            <InputField
+              label="Mobile Number"
+              required
+              icon="call-outline"
+              showCountry
+              countryCode="+91"
+              placeholder="Enter mobile number"
+              value={form.phone}
+              onChangeText={(v) => handleChange('phone', v)}
+              error={errors.phone}
+              keyboardType="number-pad"
+              rightButton={
+                otpPhoneVerified
+                  ? { label: '✔ Verified', disabled: true }
+                  : {
+                      label: 'Send OTP',
+                      onPress: handleValidateOtpPhone,
+                      disabled: !phoneValid,
+                    }
+              }
+            />
+
+            {otpVisiblePhone && (
+              <>
+                <OtpInput
+                  length={4}
+                  value={form.otpPhone}
+                  onChangeText={(v) => handleChange('otpPhone', v)}
+                  rightButton={{
+                    label: otpPhoneVerified ? 'Verified' : 'Verify',
+                    onPress: handleVerifyPhoneOtp,
+                    disabled: form.otpPhone.length !== 4 || otpPhoneVerified,
+                  }}
+                />
+
+                {!otpPhoneVerified && (
+                  <TouchableOpacity onPress={handleResendPhoneOtp} disabled={timerPhone > 0}>
+                    <Text style={signupStyles.resend}>
+                      {timerPhone > 0 ? `Resend OTP in ${timerPhone}s` : 'Resend OTP'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </>
+            )}
+
+            <InputField
+              label="Email"
+              required
+              icon="mail-outline"
+              placeholder="Enter email"
+              value={form.email}
+              onChangeText={(v) => handleChange('email', v)}
+              error={errors.email}
+              keyboardType="email-address"
+              rightButton={
+                otpEmailVerified
+                  ? { label: '✔ Verified', disabled: true }
+                  : {
+                      label: 'Send OTP',
+                      onPress: handleValidateOtpEmail,
+                      disabled: !emailValid,
+                    }
+              }
+            />
+
+            {otpVisibleEmail && (
+              <>
+                <OtpInput
+                  length={4}
+                  value={form.otpEmail}
+                  onChangeText={(v) => handleChange('otpEmail', v)}
+                  rightButton={{
+                    label: otpEmailVerified ? 'Verified' : 'Verify',
+                    onPress: handleVerifyEmailOtp,
+                    disabled: form.otpEmail.length !== 4 || otpEmailVerified,
+                  }}
+                />
+
+                {!otpEmailVerified && (
+                  <TouchableOpacity onPress={handleResendEmailOtp} disabled={timerEmail > 0}>
+                    <Text style={signupStyles.resend}>
+                      {timerEmail > 0 ? `Resend OTP in ${timerEmail}s` : 'Resend OTP'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </>
+            )}
+
+            <PrimaryButton
+              title="Create Account"
+              onPress={handleSubmit}
+              disabled={!canSubmit}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
