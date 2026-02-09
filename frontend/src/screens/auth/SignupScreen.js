@@ -17,6 +17,7 @@ import OtpInput from '../../components/form/OtpInput';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
 import { COLORS } from '../../styles/colors';
 import { signupStyles } from '../../styles/screens/signupStyles';
+import { saveUser } from "../../utils/storage";
 
 export default function SignupScreen({ navigation }) {
   const [otpVisiblePhone, setOtpVisiblePhone] = useState(false);
@@ -36,9 +37,9 @@ export default function SignupScreen({ navigation }) {
     otpEmail: '',
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({}); 
 
-  const validPhone = (v) => /^[6-9]\d{9}$/.test(v);
+  const validPhone = (v) => /^[1-9]\d{9}$/.test(v);
   const validEmail = (v) => /^\S+@\S+\.\S+$/.test(v);
 
   useEffect(() => {
@@ -64,7 +65,7 @@ export default function SignupScreen({ navigation }) {
     if (name === 'middle' && value && value.length < 2) msg = 'Only letters allowed';
     if (name === 'last' && value.length < 2) msg = 'Enter valid last name';
     if (name === 'phone' && !validPhone(value)) msg = 'Enter valid 10 digit number';
-    if (name === 'email' && !validEmail(value)) msg = 'Enter valid email';
+    if (name === 'email' && value && !validEmail(value)) msg = 'Enter valid email';
     if (name === 'otpPhone' && value.length !== 4) msg = 'Enter 4 digit OTP';
     if (name === 'otpEmail' && value.length !== 4) msg = 'Enter 4 digit OTP';
 
@@ -99,14 +100,14 @@ export default function SignupScreen({ navigation }) {
     form.first.length >= 2 &&
     form.last.length >= 2 &&
     validPhone(form.phone) &&
-    validEmail(form.email) &&
+    (!form.email || validEmail(form.email)) &&
     !errors.first &&
     !errors.last &&
     !errors.phone &&
     !errors.email;
 
   const phoneValid = validPhone(form.phone) && !errors.phone;
-  const emailValid = validEmail(form.email) && !errors.email;
+  const emailValid = !form.email || (validEmail(form.email) && !errors.email);
 
   const canSubmit =
     form.first.length >= 2 &&
@@ -114,13 +115,13 @@ export default function SignupScreen({ navigation }) {
     phoneValid &&
     emailValid &&
     form.otpPhone.length === 4 &&
-    form.otpEmail.length === 4 &&
+    (!form.email || form.otpEmail.length === 4) &&
     !errors.first &&
     !errors.last &&
     !errors.phone &&
     !errors.email &&
     otpPhoneVerified &&
-    otpEmailVerified;
+    (!form.email || otpEmailVerified);
 
   const handleValidateOtpPhone = () => {
     if (!phoneValid) {
@@ -134,6 +135,11 @@ export default function SignupScreen({ navigation }) {
   };
 
   const handleValidateOtpEmail = () => {
+    if (!form.email) {
+      // If no email provided, skip OTP verification
+      setOtpEmailVerified(true);
+      return;
+    }
     if (!emailValid) {
       Alert.alert('Error', 'Enter a valid email');
       return;
@@ -158,6 +164,11 @@ export default function SignupScreen({ navigation }) {
 
   const handleResendEmailOtp = () => {
     if (otpEmailVerified) return;
+    if (!form.email) {
+      // If no email provided, just mark as verified
+      setOtpEmailVerified(true);
+      return;
+    }
     if (!emailValid) {
       Alert.alert('Error', 'Enter a valid email');
       return;
@@ -188,18 +199,43 @@ export default function SignupScreen({ navigation }) {
     }
   };
 
-  // ✅ UPDATED HERE
-  const handleSubmit = () => {
-    if (form.otpPhone === '1111' && form.otpEmail === '2222') {
+  // ✅ SAVE USER DATA ON SIGNUP
+  const handleSubmit = async () => {
+    // Check phone OTP
+    if (form.otpPhone !== '1111') {
+      Alert.alert('Wrong OTP', 'Phone OTP is incorrect');
+      setForm((p) => ({ ...p, otpPhone: '', otpEmail: '' }));
+      return;
+    }
+
+    // Check email OTP if email is provided
+    if (form.email && form.otpEmail !== '2222') {
+      Alert.alert('Wrong OTP', 'Email OTP is incorrect');
+      setForm((p) => ({ ...p, otpPhone: '', otpEmail: '' }));
+      return;
+    }
+
+    try {
+      // Save basic user data to AsyncStorage
+      const basicUserData = {
+        first: form.first,
+        middle: form.middle,
+        last: form.last,
+        phone: form.phone,
+        email: form.email || null,
+        isLoggedIn: false, // Not logged in yet
+      };
+      
+      await saveUser(basicUserData);
+      
       Alert.alert('Success', 'Account Created', [
         {
           text: 'OK',
           onPress: () => navigation.replace('Login'),
         },
       ]);
-    } else {
-      Alert.alert('Wrong OTP', 'Try again');
-      setForm((p) => ({ ...p, otpPhone: '', otpEmail: '' }));
+    } catch (error) {
+      Alert.alert('Error', 'Failed to create account');
     }
   };
 
@@ -284,8 +320,7 @@ export default function SignupScreen({ navigation }) {
             )}
 
             <InputField
-              label="Email"
-              required
+              label="Email (optional)"
               icon="mail-outline"
               placeholder="Enter email"
               value={form.email}
@@ -293,17 +328,19 @@ export default function SignupScreen({ navigation }) {
               error={errors.email}
               keyboardType="email-address"
               rightButton={
-                otpEmailVerified
-                  ? { label: '✔ Verified', disabled: true }
-                  : {
-                      label: 'Send OTP',
-                      onPress: handleValidateOtpEmail,
-                      disabled: !emailValid,
-                    }
+                form.email ? (
+                  otpEmailVerified
+                    ? { label: '✔ Verified', disabled: true }
+                    : {
+                        label: 'Send OTP',
+                        onPress: handleValidateOtpEmail,
+                        disabled: !emailValid,
+                      }
+                ) : null
               }
             />
 
-            {otpVisibleEmail && (
+            {otpVisibleEmail && form.email && (
               <>
                 <OtpInput
                   length={4}
@@ -337,3 +374,4 @@ export default function SignupScreen({ navigation }) {
     </SafeAreaView>
   );
 }
+

@@ -8,29 +8,138 @@ import {
   Image,
   SafeAreaView,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { layoutStyles } from '../../styles/screens/socialMediaStyles';
 import { formStyles } from '../../styles/screens/socialMediaStyles';
 
+// Validation rules for Social Media
+const validations = {
+  whatsapp: {
+    exactLength: 10,
+    numbersOnly: true,
+    required: false,
+    message: 'WhatsApp must be 10 digits',
+  },
+  instagram: {
+    noSpaces: true,
+    required: false,
+    message: 'Instagram username cannot contain spaces',
+  },
+  linkedin: {
+    urlFormat: true,
+    required: false,
+    message: 'Enter valid LinkedIn URL',
+  },
+  website: {
+    urlFormat: true,
+    required: false,
+    message: 'Enter valid website URL',
+  },
+};
+
 export default function SocialMediaScreen({ navigation }) {
   const [formData, setFormData] = useState({
+    whatsapp: '',
     linkedin: '',
     instagram: '',
     twitter: '',
     facebook: '',
     youtube: '',
+    website: '',
     companyLogo: null,
     profilePhoto: null,
     qrCode: null,
     businessCard: null,
   });
 
+  const [errors, setErrors] = useState({});
+
+  // Validate single field
+  const validateField = (name, value) => {
+    const rule = validations[name];
+    if (!rule) return '';
+
+    if (!rule.required && !value.trim()) {
+      return '';
+    }
+
+    if (name === 'whatsapp' && value) {
+      const digits = value.replace(/\D/g, '');
+      if (digits.length !== rule.exactLength) {
+        return `WhatsApp must be exactly ${rule.exactLength} digits`;
+      }
+      if (!/^[0-9]*$/.test(digits)) {
+        return 'WhatsApp must contain numbers only';
+      }
+    }
+
+    if (name === 'instagram' && value) {
+      if (/\s/.test(value)) {
+        return 'Instagram username cannot contain spaces';
+      }
+    }
+
+    if (name === 'linkedin' && value) {
+      if (!/^https?:\/\/(www\.)?linkedin\.com\/.+/.test(value)) {
+        return 'Enter valid LinkedIn URL (https://linkedin.com/...)';
+      }
+    }
+
+    if (name === 'website' && value) {
+      if (!/^https?:\/\/.+\..+/.test(value)) {
+        return 'Enter valid website URL (must start with http:// or https://)';
+      }
+    }
+
+    return '';
+  };
+
+  // Handle field change
+  const handleFieldChange = (name, value) => {
+    let cleanedValue = value;
+
+    // Clean based on field type
+    if (name === 'whatsapp') {
+      cleanedValue = value.replace(/\D/g, '').slice(0, 10);
+    } else if (name === 'instagram') {
+      cleanedValue = value.replace(/\s/g, '').slice(0, 30);
+    }
+
+    setFormData({ ...formData, [name]: cleanedValue });
+
+    // Real-time validation
+    const error = validateField(name, cleanedValue);
+    setErrors({ ...errors, [name]: error });
+  };
+
+  // Validate all fields before saving
+  const validateAllFields = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    Object.keys(validations).forEach((field) => {
+      const error = validateField(field, formData[field]);
+      if (error) {
+        newErrors[field] = error;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleSave = () => {
-    console.log('Social Media & Uploads Data:', formData);
-    // Show success alert
-    navigation.navigate('Home');
+    if (validateAllFields()) {
+      Alert.alert('Success', 'Card completed successfully!');
+      console.log('Social Media Data:', formData);
+      navigation.navigate('Home');
+    } else {
+      Alert.alert('Validation Error', 'Please fix all errors');
+    }
   };
 
   const navigateToBusinessDetails = () => {
@@ -94,26 +203,39 @@ export default function SocialMediaScreen({ navigation }) {
 
         {/* Section 1: Social Links */}
         <View style={layoutStyles.detailsSection}>
-          <Text style={layoutStyles.sectionTitle}>Social Media Links</Text>
+          <Text style={layoutStyles.sectionTitle}>Social Media & Contact Links</Text>
 
           <InputField 
-            label="LinkedIn" 
+            label="WhatsApp (Optional, 10 digits)" 
+            placeholder="Mobile number"
+            icon="logo-whatsapp"
+            keyboardType="phone-pad"
+            value={formData.whatsapp}
+            onChangeText={(text) => handleFieldChange('whatsapp', text)}
+            error={errors.whatsapp}
+            maxLength={10}
+          />
+
+          <InputField 
+            label="LinkedIn (Optional)" 
             placeholder="https://linkedin.com/in/yourprofile"
             icon="logo-linkedin"
             value={formData.linkedin}
-            onChangeText={(text) => setFormData({...formData, linkedin: text})}
+            onChangeText={(text) => handleFieldChange('linkedin', text)}
+            error={errors.linkedin}
           />
 
           <InputField 
-            label="Instagram" 
-            placeholder="https://instagram.com/yourprofile"
+            label="Instagram (Optional, username no spaces)" 
+            placeholder="yourusername"
             icon="logo-instagram"
             value={formData.instagram}
-            onChangeText={(text) => setFormData({...formData, instagram: text})}
+            onChangeText={(text) => handleFieldChange('instagram', text)}
+            error={errors.instagram}
           />
 
           <InputField 
-            label="Twitter" 
+            label="Twitter (Optional)" 
             placeholder="https://twitter.com/yourprofile"
             icon="logo-twitter"
             value={formData.twitter}
@@ -121,7 +243,7 @@ export default function SocialMediaScreen({ navigation }) {
           />
 
           <InputField 
-            label="Facebook" 
+            label="Facebook (Optional)" 
             placeholder="https://facebook.com/yourprofile"
             icon="logo-facebook"
             value={formData.facebook}
@@ -129,11 +251,20 @@ export default function SocialMediaScreen({ navigation }) {
           />
 
           <InputField 
-            label="YouTube" 
+            label="YouTube (Optional)" 
             placeholder="https://youtube.com/c/yourprofile"
             icon="logo-youtube"
             value={formData.youtube}
             onChangeText={(text) => setFormData({...formData, youtube: text})}
+          />
+
+          <InputField 
+            label="Website (Optional)" 
+            placeholder="https://example.com"
+            icon="globe"
+            value={formData.website}
+            onChangeText={(text) => handleFieldChange('website', text)}
+            error={errors.website}
           />
         </View>
 
@@ -248,28 +379,43 @@ export default function SocialMediaScreen({ navigation }) {
   );
 }
 
-function InputField({ label, placeholder, icon, value, onChangeText }) {
+function InputField({ label, placeholder, icon, value, onChangeText, keyboardType, maxLength, error }) {
   return (
     <View style={formStyles.inputWrapper}>
       <Text style={formStyles.label}>
         {label}
       </Text>
-      <View style={formStyles.inputContainer}>
+      <View style={[
+        formStyles.inputContainer,
+        error && { borderColor: '#EF4444', borderWidth: 2 }
+      ]}>
         <Ionicons 
           name={icon} 
           size={20} 
-          color="#D4AF37" 
+          color={error ? '#EF4444' : '#D4AF37'} 
           style={formStyles.inputIcon} 
         />
         <TextInput
-          style={formStyles.input}
+          style={[
+            formStyles.input,
+            error && { color: '#EF4444' }
+          ]}
           placeholder={placeholder}
-          placeholderTextColor="#A0AEC0"
-          keyboardType="url"
+          placeholderTextColor={error ? '#FCA5A5' : '#A0AEC0'}
+          keyboardType={keyboardType || 'url'}
+          maxLength={maxLength}
           value={value}
           onChangeText={onChangeText}
         />
       </View>
+      {error && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
+          <Ionicons name="alert-circle" size={14} color="#EF4444" />
+          <Text style={{ color: '#EF4444', fontSize: 12, marginLeft: 4, fontWeight: '500' }}>
+            {error}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
