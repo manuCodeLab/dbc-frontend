@@ -7,11 +7,46 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { layoutStyles } from '../../styles/screens/businessDetailsStyles';
 import { formStyles } from '../../styles/screens/businessDetailsStyles';
+
+// Validation rules for Business Details
+const validations = {
+  companyName: {
+    minLength: 2,
+    required: true,
+    message: 'Company name must be at least 2 characters',
+  },
+  industry: {
+    required: true,
+    message: 'Industry/Category is required',
+  },
+  website: {
+    urlFormat: true,
+    required: false,
+    message: 'Enter valid website URL (e.g., https://example.com)',
+  },
+  address: {
+    minLength: 5,
+    required: true,
+    message: 'Address must be at least 5 characters',
+  },
+  city: {
+    lettersOnly: true,
+    required: true,
+    message: 'City must contain letters only',
+  },
+  zipCode: {
+    exactLength: 6,
+    numbersOnly: true,
+    required: true,
+    message: 'Pincode must be exactly 6 digits',
+  },
+};
 
 export default function BusinessDetailsScreen({ navigation }) {
   const [formData, setFormData] = useState({
@@ -28,10 +63,102 @@ export default function BusinessDetailsScreen({ navigation }) {
     description: '',
   });
 
+  const [errors, setErrors] = useState({});
+
+  // Validate single field
+  const validateField = (name, value) => {
+    const rule = validations[name];
+    if (!rule) return '';
+
+    if (rule.required && !value.trim()) {
+      return `${name.replace(/([A-Z])/g, ' $1').trim()} is required`;
+    }
+
+    if (!rule.required && !value.trim()) {
+      return '';
+    }
+
+    if (name === 'companyName') {
+      if (value.trim().length < rule.minLength) {
+        return `Company name must be at least ${rule.minLength} characters`;
+      }
+    }
+
+    if (name === 'address') {
+      if (value.trim().length < rule.minLength) {
+        return `Address must be at least ${rule.minLength} characters`;
+      }
+    }
+
+    if (name === 'city') {
+      if (!/^[a-zA-Z\s]{2,}$/.test(value.trim())) {
+        return 'City must contain letters only';
+      }
+    }
+
+    if (name === 'zipCode') {
+      const digits = value.replace(/\D/g, '');
+      if (value && digits.length !== rule.exactLength) {
+        return `Pincode must be exactly ${rule.exactLength} digits`;
+      }
+      if (value && !/^[0-9]*$/.test(digits)) {
+        return 'Pincode must contain numbers only';
+      }
+    }
+
+    if (name === 'website' && value) {
+      if (!/^https?:\/\/.+\..+/.test(value)) {
+        return 'Enter valid website URL (must start with http:// or https://)';
+      }
+    }
+
+    return '';
+  };
+
+  // Handle field change
+  const handleFieldChange = (name, value) => {
+    let cleanedValue = value;
+
+    // Clean based on field type
+    if (name === 'companyName') {
+      cleanedValue = value.slice(0, 50);
+    } else if (name === 'city') {
+      cleanedValue = value.replace(/[^a-zA-Z\s]/g, '').slice(0, 30);
+    } else if (name === 'zipCode') {
+      cleanedValue = value.replace(/\D/g, '').slice(0, 6);
+    }
+
+    setFormData({ ...formData, [name]: cleanedValue });
+
+    // Real-time validation
+    const error = validateField(name, cleanedValue);
+    setErrors({ ...errors, [name]: error });
+  };
+
+  // Validate all fields before saving
+  const validateAllFields = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    Object.keys(validations).forEach((field) => {
+      const error = validateField(field, formData[field]);
+      if (error) {
+        newErrors[field] = error;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleSave = () => {
-    console.log('Business Data:', formData);
-    // Navigate to SocialMediaScreen (Step 3)
-    navigation.navigate('SocialMediaScreen');
+    if (validateAllFields()) {
+      console.log('Business Data:', formData);
+      navigation.navigate('SocialMediaScreen');
+    } else {
+      Alert.alert('Validation Error', 'Please fix all errors before proceeding');
+    }
   };
 
   const navigateToDashboard = () => {
@@ -97,23 +224,27 @@ export default function BusinessDetailsScreen({ navigation }) {
             placeholder="Enter company name"
             icon="business"
             value={formData.companyName}
-            onChangeText={(text) => setFormData({...formData, companyName: text})}
+            onChangeText={(text) => handleFieldChange('companyName', text)}
+            error={errors.companyName}
+            maxLength={50}
           />
 
           <InputField 
-            label="Industry *" 
+            label="Industry/Category *" 
             placeholder="e.g., Technology, Finance"
             icon="briefcase"
             value={formData.industry}
             onChangeText={(text) => setFormData({...formData, industry: text})}
+            error={errors.industry}
           />
 
           <InputField 
-            label="Website" 
+            label="Website (Optional)" 
             placeholder="https://example.com"
             icon="globe"
             value={formData.website}
-            onChangeText={(text) => setFormData({...formData, website: text})}
+            onChangeText={(text) => handleFieldChange('website', text)}
+            error={errors.website}
           />
 
           <InputField 
@@ -140,22 +271,24 @@ export default function BusinessDetailsScreen({ navigation }) {
           <Text style={layoutStyles.sectionTitle}>Address Information</Text>
 
           <InputField 
-            label="Address *" 
+            label="Address * (min 5 chars)" 
             placeholder="Street address"
             icon="location"
             multiline
             value={formData.address}
-            onChangeText={(text) => setFormData({...formData, address: text})}
+            onChangeText={(text) => handleFieldChange('address', text)}
+            error={errors.address}
           />
 
           <View style={layoutStyles.rowContainer}>
             <View style={layoutStyles.rowItem}>
               <InputField 
-                label="City *" 
+                label="City * (letters only)" 
                 placeholder="City"
                 icon="home"
                 value={formData.city}
-                onChangeText={(text) => setFormData({...formData, city: text})}
+                onChangeText={(text) => handleFieldChange('city', text)}
+                error={errors.city}
               />
             </View>
             <View style={layoutStyles.rowItem}>
@@ -172,12 +305,14 @@ export default function BusinessDetailsScreen({ navigation }) {
           <View style={layoutStyles.rowContainer}>
             <View style={layoutStyles.rowItem}>
               <InputField 
-                label="Zip Code *" 
+                label="Pincode * (6 digits)" 
                 placeholder="Zip code"
                 icon="pin"
                 keyboardType="numeric"
                 value={formData.zipCode}
-                onChangeText={(text) => setFormData({...formData, zipCode: text})}
+                onChangeText={(text) => handleFieldChange('zipCode', text)}
+                error={errors.zipCode}
+                maxLength={6}
               />
             </View>
             <View style={layoutStyles.rowItem}>
@@ -232,36 +367,63 @@ export default function BusinessDetailsScreen({ navigation }) {
   );
 }
 
-function InputField({ label, placeholder, icon, multiline, keyboardType, value, onChangeText }) {
+function InputField({ label, placeholder, icon, multiline, keyboardType, value, onChangeText, maxLength, error }) {
+  const renderLabel = () => {
+    if (!label) return null;
+    
+    const parts = label.split('*');
+    
+    if (parts.length === 1) {
+      return <Text style={formStyles.label}>{label}</Text>;
+    }
+    
+    return (
+      <Text style={formStyles.label}>
+        {parts[0]}
+        <Text style={{ color: '#EF4444', fontWeight: '700' }}>*</Text>
+        {parts[1]}
+      </Text>
+    );
+  };
+
   return (
     <View style={formStyles.inputWrapper}>
-      <Text style={formStyles.label}>
-        {label}
-      </Text>
+      {renderLabel()}
       <View style={[
         formStyles.inputContainer,
-        multiline && formStyles.addressInputContainer
+        multiline && formStyles.addressInputContainer,
+        error && { borderColor: '#EF4444', borderWidth: 2 }
       ]}>
         <Ionicons 
           name={icon} 
           size={20} 
-          color="#D4AF37" 
+          color={error ? '#EF4444' : '#D4AF37'} 
           style={[formStyles.inputIcon, multiline && formStyles.addressIcon]} 
         />
         <TextInput
           style={[
             formStyles.input,
-            multiline && formStyles.addressInput
+            multiline && formStyles.addressInput,
+            error && { color: '#EF4444' }
           ]}
           placeholder={placeholder}
-          placeholderTextColor="#A0AEC0"
+          placeholderTextColor={error ? '#FCA5A5' : '#A0AEC0'}
           multiline={multiline}
           numberOfLines={multiline ? 4 : 1}
           keyboardType={keyboardType}
+          maxLength={maxLength}
           value={value}
           onChangeText={onChangeText}
         />
       </View>
+      {error && (
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
+          <Ionicons name="alert-circle" size={14} color="#EF4444" />
+          <Text style={{ color: '#EF4444', fontSize: 12, marginLeft: 4, fontWeight: '500' }}>
+            {error}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }

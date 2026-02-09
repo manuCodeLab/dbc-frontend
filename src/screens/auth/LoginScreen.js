@@ -16,6 +16,7 @@ import InputField from '../../components/form/InputField';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
 import { COLORS } from '../../styles/colors';
 import { loginStyles } from '../../styles/screens/loginStyles';
+import { getUser, saveUser } from '../../utils/storage';
 
 const { width } = Dimensions.get('window');
 
@@ -82,10 +83,32 @@ export default function LoginScreen({ navigation }) {
     }, 100);
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (otp.join('') === '123456') {
-      Alert.alert('Success 🎉', 'OTP Verified');
-      navigation.replace('Landing');
+      try {
+        // Verify user exists in storage
+        const user = await getUser();
+        if (!user) {
+          Alert.alert('Error', 'User not found. Please sign up first.');
+          resetOtpBoxes();
+          return;
+        }
+        
+        // Verify phone number matches
+        if (user.phone !== phone) {
+          Alert.alert('Error', 'Phone number does not match signup');
+          resetOtpBoxes();
+          return;
+        }
+        
+        // Update login status and redirect to Landing page
+        await saveUser({ ...user, isLoggedIn: true });
+        Alert.alert('Success 🎉', 'OTP Verified');
+        navigation.replace('Landing');
+      } catch (error) {
+        Alert.alert('Error', 'Login failed');
+        resetOtpBoxes();
+      }
     } else {
       Alert.alert('Wrong OTP ❌', 'Enter 123456');
       resetOtpBoxes();
