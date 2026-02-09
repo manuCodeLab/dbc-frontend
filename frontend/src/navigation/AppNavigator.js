@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
 import SplashScreen from '../screens/auth/SplashScreen';
+import LocationPermissionScreen from '../screens/auth/LocationPermissionScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignupScreen from '../screens/auth/SignupScreen';
 import LandingScreen from '../screens/main/LandingScreen';
@@ -11,6 +12,7 @@ import DashboardScreen from '../screens/main/DashboardScreen';
 import BusinessDetailsScreen from '../screens/main/BusinessDetailsScreen';
 import SocialMediaScreen from '../screens/main/SocialMediaScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
+import ContactsScreen from '../screens/main/ContactsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -28,6 +30,8 @@ function DashboardTabs() {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
+          } else if (route.name === 'Contacts') {
+            iconName = focused ? 'people' : 'people-outline';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -57,6 +61,13 @@ function DashboardTabs() {
         }}
       />
       <Tab.Screen 
+        name="Contacts" 
+        component={ContactsScreen}
+        options={{
+          tabBarLabel: 'Contacts',
+        }}
+      />
+      <Tab.Screen 
         name="Profile" 
         component={ProfileScreen}
         options={{
@@ -75,6 +86,7 @@ export default function AppNavigator() {
       initialRouteName="Splash"
     >
       <Stack.Screen name="Splash" component={SplashScreen} />
+      <Stack.Screen name="LocationPermission" component={LocationPermissionScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
       <Stack.Screen name="Landing" component={LandingScreen} />

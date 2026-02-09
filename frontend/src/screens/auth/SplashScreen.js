@@ -6,7 +6,7 @@ import { splashStyles } from '../../styles/screens/splashStyles';
 export default function SplashScreen({ navigation }) {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('Login');
+      navigation.replace('LocationPermission');
     }, 2500); // 2.5 seconds
 
     return () => clearTimeout(timer);

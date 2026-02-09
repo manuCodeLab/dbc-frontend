@@ -1,0 +1,146 @@
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../colors';
+
+export const locationStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.card,
+    justifyContent: 'space-between',
+    paddingVertical: 20,
+  },
+  logoSection: {
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom: 30,
+  },
+  logoContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: COLORS.accent,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoText: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  cardContainer: {
+    marginHorizontal: 20,
+    backgroundColor: COLORS.card,
+    borderRadius: 12,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  iconWrapper: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.primary,
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 22,
+  },
+  optionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+    gap: 12,
+  },
+  optionBox: {
+    flex: 1,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 100,
+  },
+  optionBoxSelected: {
+    borderColor: COLORS.accent,
+    backgroundColor: 'rgba(212, 175, 55, 0.08)',
+  },
+  optionMapContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mapLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.primary,
+    marginTop: 8,
+  },
+  permissionOptions: {
+    marginBottom: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    paddingTop: 20,
+  },
+  permissionOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+  permissionOptionSelected: {
+    borderColor: COLORS.accent,
+    backgroundColor: 'rgba(212, 175, 55, 0.08)',
+  },
+  permissionText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: COLORS.primary,
+    textAlign: 'center',
+  },
+  permissionTextSelected: {
+    color: COLORS.accent,
+    fontWeight: '600',
+  },
+  denyText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#FF6B6B',
+    textAlign: 'center',
+  },
+  bottomButtons: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  skipButton: {
+    flex: 0.35,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: COLORS.accent,
+    alignItems: 'center',
+  },
+  skipButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.accent,
+  },
+  grantButton: {
+    flex: 0.65,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: COLORS.accent,
+    alignItems: 'center',
+  },
+  grantButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.card,
+  },
+});

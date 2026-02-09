@@ -104,7 +104,7 @@ export default function LoginScreen({ navigation }) {
         // Update login status and redirect to Landing page
         await saveUser({ ...user, isLoggedIn: true });
         Alert.alert('Success 🎉', 'OTP Verified');
-        navigation.replace('Landing');
+        navigation.navigate('Landing');
       } catch (error) {
         Alert.alert('Error', 'Login failed');
         resetOtpBoxes();
