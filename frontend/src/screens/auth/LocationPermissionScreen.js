@@ -29,18 +29,13 @@ export default function LocationPermissionScreen({ navigation }) {
     <SafeAreaView style={locationStyles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={COLORS.card} />
 
-      {/* Logo Section */}
-      <View style={locationStyles.logoSection}>
-        <View style={locationStyles.logoContainer}>
-          <Text style={locationStyles.logoText}>DBC</Text>
-        </View>
-      </View>
+      {/* (Logo removed) */}
 
-      {/* Main Content Card */}
+      {/* Main Content Card (centered) */}
       <View style={locationStyles.cardContainer}>
         {/* Location Icon */}
         <View style={locationStyles.iconWrapper}>
-          <Ionicons name="location" size={48} color={COLORS.accent} />
+          <Ionicons name="location" size={48} color={COLORS.card} />
         </View>
 
         {/* Title */}
@@ -89,59 +84,94 @@ export default function LocationPermissionScreen({ navigation }) {
             ]}
             onPress={() => setSelectedOption('while-using')}
           >
-            <Text
-              style={[
-                locationStyles.permissionText,
-                selectedOption === 'while-using' && locationStyles.permissionTextSelected,
-              ]}
-            >
-              While using the app
-            </Text>
+            <View style={locationStyles.permissionOptionRow}>
+              <View
+                style={[
+                  locationStyles.circleIndicator,
+                  selectedOption === 'while-using' && locationStyles.circleIndicatorSelected,
+                ]}
+              />
+              <Text
+                style={[
+                  locationStyles.permissionText,
+                  selectedOption === 'while-using' && locationStyles.permissionTextSelected,
+                ]}
+              >
+                While using the app
+              </Text>
+            </View>
           </TouchableOpacity>
 
           {/* Only This Time */}
           <TouchableOpacity
-            style={locationStyles.permissionOption}
+            style={[
+              locationStyles.permissionOption,
+              selectedOption === 'only-once' && locationStyles.permissionOptionSelected,
+            ]}
             onPress={() => setSelectedOption('only-once')}
           >
-            <Text
-              style={[
-                locationStyles.permissionText,
-                selectedOption === 'only-once' && locationStyles.permissionTextSelected,
-              ]}
-            >
-              Only this time
-            </Text>
+            <View style={locationStyles.permissionOptionRow}>
+              <View
+                style={[
+                  locationStyles.circleIndicator,
+                  selectedOption === 'only-once' && locationStyles.circleIndicatorSelected,
+                ]}
+              />
+              <Text
+                style={[
+                  locationStyles.permissionText,
+                  selectedOption === 'only-once' && locationStyles.permissionTextSelected,
+                ]}
+              >
+                Only this time
+              </Text>
+            </View>
           </TouchableOpacity>
 
           {/* Don't Allow */}
           <TouchableOpacity
-            style={locationStyles.permissionOption}
-            onPress={handleSkip}
+            style={[
+              locationStyles.permissionOption,
+              selectedOption === 'dont-allow' && locationStyles.permissionOptionSelected,
+              locationStyles.permissionOptionStretch,
+              locationStyles.permissionOptionNoBubble,
+            ]}
+            onPress={() => {
+              setSelectedOption('dont-allow');
+              setTimeout(() => handleSkip(), 200);
+            }}
           >
-            <Text style={locationStyles.denyText}>Don't allow</Text>
+            <View style={locationStyles.permissionOptionCenter}>
+              <Text
+                style={[
+                  locationStyles.denyText,
+                  selectedOption === 'dont-allow' && locationStyles.permissionTextSelected,
+                ]}
+              >
+                Don't allow
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
-      </View>
+        {/* Bottom Buttons moved inside card to keep card centered */}
+        <View style={locationStyles.bottomButtonsInside}>
+          <TouchableOpacity
+            style={locationStyles.skipButton}
+            onPress={handleSkip}
+          >
+            <Text style={locationStyles.skipButtonText}>Skip for now</Text>
+          </TouchableOpacity>
 
-      {/* Bottom Buttons */}
-      <View style={locationStyles.bottomButtons}>
-        <TouchableOpacity
-          style={locationStyles.skipButton}
-          onPress={handleSkip}
-        >
-          <Text style={locationStyles.skipButtonText}>Skip for now</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={locationStyles.grantButton}
-          onPress={handleGrantPermission}
-          disabled={permissionRequested}
-        >
-          <Text style={locationStyles.grantButtonText}>
-            {permissionRequested ? 'Granting...' : 'Grant Location Permission'}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={locationStyles.grantButton}
+            onPress={handleGrantPermission}
+            disabled={permissionRequested}
+          >
+            <Text style={locationStyles.grantButtonText}>
+              {permissionRequested ? 'Granting...' : 'Grant Location Permission'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );

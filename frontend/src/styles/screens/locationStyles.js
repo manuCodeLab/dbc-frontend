@@ -5,7 +5,7 @@ export const locationStyles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.card,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingVertical: 20,
   },
   logoSection: {
@@ -33,10 +33,19 @@ export const locationStyles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: '#E5E7EB',
+    // center card width and add shadow-ish look
+    alignSelf: 'center',
+    width: '90%',
   },
   iconWrapper: {
     alignItems: 'center',
     marginBottom: 20,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: COLORS.accent,
+    justifyContent: 'center',
+    alignSelf: 'center',
   },
   cardTitle: {
     fontSize: 16,
@@ -85,36 +94,59 @@ export const locationStyles = StyleSheet.create({
   },
   permissionOption: {
     paddingVertical: 12,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     borderRadius: 8,
     marginBottom: 8,
     backgroundColor: 'transparent',
     borderWidth: 1,
     borderColor: '#F3F4F6',
+    width: '100%',
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   permissionOptionSelected: {
     borderColor: COLORS.accent,
-    backgroundColor: 'rgba(212, 175, 55, 0.08)',
+    backgroundColor: COLORS.accent,
+  },
+  permissionOptionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  permissionOptionCenter: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 6,
+    width: '100%',
+  },
+  permissionOptionStretch: {
+    alignSelf: 'stretch',
+  },
+  permissionOptionNoBubble: {
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    paddingVertical: 10,
+    marginBottom: 8,
   },
   permissionText: {
-    fontSize: 13,
-    fontWeight: '500',
+    fontSize: 16,
+    color: COLORS.text,
+    textAlign: 'center',
+  },
+  denyText: {
+    fontSize: 16,
     color: COLORS.primary,
     textAlign: 'center',
   },
   permissionTextSelected: {
-    color: COLORS.accent,
-    fontWeight: '600',
+    color: COLORS.card,
   },
-  denyText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#FF6B6B',
-    textAlign: 'center',
-  },
-  bottomButtons: {
+  bottomButtonsInside: {
     flexDirection: 'row',
-    paddingHorizontal: 20,
+    justifyContent: 'space-between',
+    marginTop: 20,
     gap: 12,
   },
   skipButton: {
