@@ -17,7 +17,7 @@ export default function SplashScreen({ navigation }) {
       {/* Logo Circle */}
       <View style={splashStyles.circle}>
         <Image
-          source={require('../../../assets/splash-icon.png')}
+          source={require('../../assets/images/splash-icon.png')}
           style={splashStyles.logo}
           resizeMode="contain"
         />

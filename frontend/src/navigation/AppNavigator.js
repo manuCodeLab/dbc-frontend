@@ -13,6 +13,7 @@ import BusinessDetailsScreen from '../screens/main/BusinessDetailsScreen';
 import SocialMediaScreen from '../screens/main/SocialMediaScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
 import ContactsScreen from '../screens/main/ContactsScreen';
+// onboarding screens removed
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();

@@ -130,7 +130,7 @@ export const locationStyles = StyleSheet.create({
     paddingVertical: 10,
     marginBottom: 8,
   },
-  permissionText: {
+  permissionText: { 
     fontSize: 16,
     color: COLORS.text,
     textAlign: 'center',
