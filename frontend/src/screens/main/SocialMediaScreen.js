@@ -136,7 +136,7 @@ export default function SocialMediaScreen({ navigation }) {
     if (validateAllFields()) {
       Alert.alert('Success', 'Card completed successfully!');
       console.log('Social Media Data:', formData);
-      navigation.navigate('Home');
+      navigation.replace('SelectTemplate');
     } else {
       Alert.alert('Validation Error', 'Please fix all errors');
     }
