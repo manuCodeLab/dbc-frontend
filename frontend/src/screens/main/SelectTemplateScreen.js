@@ -9,16 +9,37 @@ import Template1 from "../../components/templates/Template1";
 import Template2 from "../../components/templates/Template2";
 import Template3 from "../../components/templates/Template3";
 import Template4 from "../../components/templates/Template4";
+import Template5 from "../../components/templates/Template5";
+import Template6 from "../../components/templates/Template6";
+import Template7 from "../../components/templates/Template7";
 
 export default function SelectTemplateScreen({ route, navigation }) {
   const [selected, setSelected] = useState(null);
-  const cardData = route.params?.cardData || {};
+  const [cardData, setCardData] = useState(route.params?.cardData || {});
+
+  // If route didn't pass cardData, try loading draft from storage
+  React.useEffect(() => {
+    if (!route.params?.cardData) {
+      (async () => {
+        try {
+          const { getCardDraft } = await import('../../utils/storage');
+          const draft = await getCardDraft();
+          if (draft && Object.keys(draft).length) setCardData(draft);
+        } catch (e) {
+          // ignore
+        }
+      })();
+    }
+  }, [route.params]);
 
   const templates = [
-    { id: 1, name: 'Glass', component: <Template1 cardData={cardData} /> },
-    { id: 2, name: 'Minimal', component: <Template2 cardData={cardData} /> },
-    { id: 3, name: 'Modern', component: <Template3 cardData={cardData} /> },
-    { id: 4, name: 'Bold', component: <Template4 cardData={cardData} /> },
+    { id: 1, name: 'Glass', component: Template1 },
+    { id: 2, name: 'Minimal', component: Template2 },
+    { id: 3, name: 'Modern', component: Template3 },
+    { id: 4, name: 'Bold', component: Template4 },
+    { id: 5, name: 'Sage', component: Template5 },
+    { id: 6, name: 'Network', component: Template6 },
+    { id: 7, name: 'Artist', component: Template7 },
   ];
 
   return (
@@ -39,7 +60,6 @@ export default function SelectTemplateScreen({ route, navigation }) {
         {/* Title Section */}
         <View style={styles.titleSection}>
           <Text style={styles.mainTitle}>Choose a template</Text>
-          <Text style={styles.subtitle}>for your digital business card</Text>
         </View>
 
         {/* Template Cards - One by One */}
@@ -52,7 +72,10 @@ export default function SelectTemplateScreen({ route, navigation }) {
             >
               {/* Card Preview */}
               <View style={styles.cardPreviewWrapper}>
-                {template.component}
+                {(() => {
+                  const Comp = template.component;
+                  return <Comp cardData={cardData} thumbnail={true} />;
+                })()}
               </View>
 
               {/* Template Name */}

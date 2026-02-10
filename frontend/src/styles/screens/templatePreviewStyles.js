@@ -42,7 +42,7 @@ export default StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#5555DD',
+    backgroundColor: COLORS.accent,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,
@@ -78,10 +78,10 @@ export default StyleSheet.create({
     marginVertical: 16,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    backgroundColor: '#E8E8FF',
+    backgroundColor: '#FFF7E6',
     borderRadius: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#5555DD',
+    borderLeftColor: COLORS.accent,
   },
 
   tipText: {
@@ -92,7 +92,7 @@ export default StyleSheet.create({
 
   tipBold: {
     fontWeight: '700',
-    color: '#5555DD',
+    color: COLORS.accent,
   },
 
   actionsContainer: {
@@ -119,9 +119,9 @@ export default StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#E8E8FF',
+    backgroundColor: '#FFF7E6',
     borderWidth: 2,
-    borderColor: '#5555DD',
+    borderColor: COLORS.accent,
     paddingVertical: 14,
     borderRadius: 10,
     marginBottom: 12,
@@ -130,7 +130,7 @@ export default StyleSheet.create({
   saveButtonText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#5555DD',
+    color: COLORS.accent,
     marginLeft: 8,
   },
 
@@ -154,7 +154,7 @@ export default StyleSheet.create({
   shareButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#5555DD',
+    backgroundColor: COLORS.accent,
     paddingVertical: 14,
     borderRadius: 10,
   },

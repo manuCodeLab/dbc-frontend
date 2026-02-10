@@ -112,7 +112,7 @@ export default StyleSheet.create({
 
   continueButton: {
     flexDirection: 'row',
-    backgroundColor: '#5555DD',
+    backgroundColor: COLORS.accent,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',

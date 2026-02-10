@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { saveCardDraft } from '../../utils/storage';
+import COLORS from '../../styles/colors';
 
 export default function CreateCardPersonal({ navigation }) {
   const [formData, setFormData] = useState({
@@ -18,7 +20,9 @@ export default function CreateCardPersonal({ navigation }) {
       Alert.alert('Required Fields', 'Please fill in Name, Email, and Phone');
       return;
     }
-    navigation.navigate('SelectTemplateScreen', { cardData: formData });
+    // save personal data into draft and navigate
+    saveCardDraft(formData).catch(() => {});
+    navigation.navigate('SelectTemplate', { cardData: formData });
   };
 
   return (
@@ -99,7 +103,7 @@ const styles = StyleSheet.create({
   },
   buttons: { flexDirection: 'row', justifyContent: 'center', marginTop: 20 },
   next: { 
-    backgroundColor: '#5555DD', 
+    backgroundColor: COLORS.accent, 
     paddingHorizontal: 24, 
     paddingVertical: 12, 
     borderRadius: 8,

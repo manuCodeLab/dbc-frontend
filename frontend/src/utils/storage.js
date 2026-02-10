@@ -12,3 +12,17 @@ export const getUser = async () => {
 export const clearUser = async () => {
   await AsyncStorage.removeItem('USER');
 };
+
+// Card draft helpers: save/read temporary card data across steps
+export const saveCardDraft = async (card) => {
+  await AsyncStorage.setItem('CARD_DRAFT', JSON.stringify(card));
+};
+
+export const getCardDraft = async () => {
+  const data = await AsyncStorage.getItem('CARD_DRAFT');
+  return data ? JSON.parse(data) : {};
+};
+
+export const clearCardDraft = async () => {
+  await AsyncStorage.removeItem('CARD_DRAFT');
+};

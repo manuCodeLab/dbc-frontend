@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { layoutStyles } from '../../styles/screens/businessDetailsStyles';
 import { formStyles } from '../../styles/screens/businessDetailsStyles';
+import { getCardDraft, saveCardDraft } from '../../utils/storage';
 
 // Validation rules for Business Details
 const validations = {
@@ -155,7 +156,17 @@ export default function BusinessDetailsScreen({ navigation }) {
   const handleSave = () => {
     if (validateAllFields()) {
       console.log('Business Data:', formData);
-      navigation.navigate('SocialMediaScreen');
+      // merge with any existing draft and save, then navigate forward
+      (async () => {
+        try {
+          const existing = await getCardDraft();
+          const merged = { ...existing, ...formData };
+          await saveCardDraft(merged);
+        } catch (e) {
+          console.warn('save draft failed', e);
+        }
+        navigation.navigate('SocialMediaScreen');
+      })();
     } else {
       Alert.alert('Validation Error', 'Please fix all errors before proceeding');
     }

@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { layoutStyles } from '../../styles/screens/socialMediaStyles';
 import { formStyles } from '../../styles/screens/socialMediaStyles';
+import { getCardDraft, saveCardDraft, clearCardDraft } from '../../utils/storage';
 
 // Validation rules for Social Media
 const validations = {
@@ -134,9 +135,20 @@ export default function SocialMediaScreen({ navigation }) {
 
   const handleSave = () => {
     if (validateAllFields()) {
-      Alert.alert('Success', 'Card completed successfully!');
-      console.log('Social Media Data:', formData);
-      navigation.replace('SelectTemplate');
+      // merge with draft, save, then go to SelectTemplate with merged data
+      (async () => {
+        try {
+          const existing = await getCardDraft();
+          const merged = { ...existing, ...formData };
+          await saveCardDraft(merged);
+          console.log('Social Media Data:', formData);
+          Alert.alert('Success', 'Card completed successfully!');
+          navigation.replace('SelectTemplate', { cardData: merged });
+        } catch (e) {
+          console.warn('save draft failed', e);
+          navigation.replace('SelectTemplate');
+        }
+      })();
     } else {
       Alert.alert('Validation Error', 'Please fix all errors');
     }
