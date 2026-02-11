@@ -19,13 +19,22 @@ import { COLORS } from '../../styles/colors';
 import { signupStyles } from '../../styles/screens/signupStyles';
 import { saveUser } from "../../utils/storage";
 
+// Generate random OTP
+const generateOTP = (length = 4) => {
+  return Math.floor(Math.pow(10, length - 1) + Math.random() * (Math.pow(10, length) - Math.pow(10, length - 1)));
+};
+
 export default function SignupScreen({ navigation }) {
   const [otpVisiblePhone, setOtpVisiblePhone] = useState(false);
   const [otpVisibleEmail, setOtpVisibleEmail] = useState(false);
   const [timerPhone, setTimerPhone] = useState(30);
   const [timerEmail, setTimerEmail] = useState(30);
+  const [generatedOtpPhone, setGeneratedOtpPhone] = useState('');
+  const [generatedOtpEmail, setGeneratedOtpEmail] = useState('');
   const [otpPhoneVerified, setOtpPhoneVerified] = useState(false);
   const [otpEmailVerified, setOtpEmailVerified] = useState(false);
+  const [wrongOtpPhoneCooldown, setWrongOtpPhoneCooldown] = useState(0);
+  const [wrongOtpEmailCooldown, setWrongOtpEmailCooldown] = useState(0);
 
   const [form, setForm] = useState({
     first: '',
@@ -57,6 +66,22 @@ export default function SignupScreen({ navigation }) {
     }
     return () => clearInterval(i);
   }, [otpVisibleEmail, timerEmail]);
+
+  useEffect(() => {
+    let cooldownInterval;
+    if (wrongOtpPhoneCooldown > 0) {
+      cooldownInterval = setInterval(() => setWrongOtpPhoneCooldown((t) => t - 1), 1000);
+    }
+    return () => clearInterval(cooldownInterval);
+  }, [wrongOtpPhoneCooldown]);
+
+  useEffect(() => {
+    let cooldownInterval;
+    if (wrongOtpEmailCooldown > 0) {
+      cooldownInterval = setInterval(() => setWrongOtpEmailCooldown((t) => t - 1), 1000);
+    }
+    return () => clearInterval(cooldownInterval);
+  }, [wrongOtpEmailCooldown]);
 
   const validate = (name, value) => {
     let msg = '';
@@ -124,17 +149,28 @@ export default function SignupScreen({ navigation }) {
     (!form.email || otpEmailVerified);
 
   const handleValidateOtpPhone = () => {
+    if (wrongOtpPhoneCooldown > 0) {
+      Alert.alert('Please Wait', `You can request OTP again in ${wrongOtpPhoneCooldown} seconds`);
+      return;
+    }
     if (!phoneValid) {
       Alert.alert('Error', 'Enter a valid phone number');
       return;
     }
     setOtpPhoneVerified(false);
-    Alert.alert('Phone OTP', 'Your phone OTP is 1111');
+    const randomOtp = generateOTP(4).toString();
+    setGeneratedOtpPhone(randomOtp);
+    Alert.alert('Phone OTP', `Your phone OTP is ${randomOtp}`);
     setOtpVisiblePhone(true);
     setTimerPhone(30);
+    setWrongOtpPhoneCooldown(0);
   };
 
   const handleValidateOtpEmail = () => {
+    if (wrongOtpEmailCooldown > 0) {
+      Alert.alert('Please Wait', `You can request OTP again in ${wrongOtpEmailCooldown} seconds`);
+      return;
+    }
     if (!form.email) {
       // If no email provided, skip OTP verification
       setOtpEmailVerified(true);
@@ -145,24 +181,37 @@ export default function SignupScreen({ navigation }) {
       return;
     }
     setOtpEmailVerified(false);
-    Alert.alert('Email OTP', 'Your email OTP is 2222');
+    const randomOtp = generateOTP(4).toString();
+    setGeneratedOtpEmail(randomOtp);
+    Alert.alert('Email OTP', `Your email OTP is ${randomOtp}`);
     setOtpVisibleEmail(true);
     setTimerEmail(30);
+    setWrongOtpEmailCooldown(0);
   };
 
   const handleResendPhoneOtp = () => {
+    if (wrongOtpPhoneCooldown > 0) {
+      Alert.alert('Please Wait', `You can resend OTP again in ${wrongOtpPhoneCooldown} seconds`);
+      return;
+    }
     if (otpPhoneVerified) return;
     if (!phoneValid) {
       Alert.alert('Error', 'Enter a valid phone number');
       return;
     }
     setOtpPhoneVerified(false);
-    Alert.alert('Phone OTP', 'Your phone OTP is 1111');
+    const randomOtp = generateOTP(4).toString();
+    setGeneratedOtpPhone(randomOtp);
+    Alert.alert('Phone OTP', `Your phone OTP is ${randomOtp}`);
     setOtpVisiblePhone(true);
     setTimerPhone(30);
   };
 
   const handleResendEmailOtp = () => {
+    if (wrongOtpEmailCooldown > 0) {
+      Alert.alert('Please Wait', `You can resend OTP again in ${wrongOtpEmailCooldown} seconds`);
+      return;
+    }
     if (otpEmailVerified) return;
     if (!form.email) {
       // If no email provided, just mark as verified
@@ -174,42 +223,48 @@ export default function SignupScreen({ navigation }) {
       return;
     }
     setOtpEmailVerified(false);
-    Alert.alert('Email OTP', 'Your email OTP is 2222');
+    const randomOtp = generateOTP(4).toString();
+    setGeneratedOtpEmail(randomOtp);
+    Alert.alert('Email OTP', `Your email OTP is ${randomOtp}`);
     setOtpVisibleEmail(true);
     setTimerEmail(30);
   };
 
   const handleVerifyPhoneOtp = () => {
-    if (form.otpPhone === '1111') {
+    if (form.otpPhone === generatedOtpPhone) {
       setOtpPhoneVerified(true);
       Alert.alert('Verified', 'Phone OTP verified');
     } else {
       setOtpPhoneVerified(false);
-      Alert.alert('Invalid', 'Phone OTP is incorrect');
+      setForm((p) => ({ ...p, otpPhone: '' }));
+      setWrongOtpPhoneCooldown(30);
+      Alert.alert('Invalid', 'Phone OTP is incorrect. Try again after 30 seconds');
     }
   };
 
   const handleVerifyEmailOtp = () => {
-    if (form.otpEmail === '2222') {
+    if (form.otpEmail === generatedOtpEmail) {
       setOtpEmailVerified(true);
       Alert.alert('Verified', 'Email OTP verified');
     } else {
       setOtpEmailVerified(false);
-      Alert.alert('Invalid', 'Email OTP is incorrect');
+      setForm((p) => ({ ...p, otpEmail: '' }));
+      setWrongOtpEmailCooldown(30);
+      Alert.alert('Invalid', 'Email OTP is incorrect. Try again after 30 seconds');
     }
   };
 
   // ✅ SAVE USER DATA ON SIGNUP
   const handleSubmit = async () => {
     // Check phone OTP
-    if (form.otpPhone !== '1111') {
+    if (form.otpPhone !== generatedOtpPhone) {
       Alert.alert('Wrong OTP', 'Phone OTP is incorrect');
       setForm((p) => ({ ...p, otpPhone: '', otpEmail: '' }));
       return;
     }
 
     // Check email OTP if email is provided
-    if (form.email && form.otpEmail !== '2222') {
+    if (form.email && form.otpEmail !== generatedOtpEmail) {
       Alert.alert('Wrong OTP', 'Email OTP is incorrect');
       setForm((p) => ({ ...p, otpPhone: '', otpEmail: '' }));
       return;

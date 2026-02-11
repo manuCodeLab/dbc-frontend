@@ -13,9 +13,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { profileStyles } from '../../styles/screens/profileStyles';
 import { COLORS } from '../../styles/colors';
 import { getUser, saveUser, clearUser } from '../../utils/storage';
+import Footer from '../../components/common/Footer';
 
 
-export default function ProfileScreen({ navigation }) {
+export default function ProfileScreen({ navigation, route }) {
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
     first: '',
@@ -30,6 +31,7 @@ export default function ProfileScreen({ navigation }) {
 
   const [editedData, setEditedData] = useState(profileData);
   const [loading, setLoading] = useState(true);
+  const fromScreen = route?.params?.fromScreen || null;
 
   // Load user data on mount
   useEffect(() => {
@@ -313,6 +315,11 @@ export default function ProfileScreen({ navigation }) {
 
       <View style={{ height: 30 }} />
       </ScrollView>
+      <Footer 
+        activeTab="profile" 
+        navigation={navigation} 
+        fromScreen={fromScreen || null}
+      />
     </SafeAreaView>
   );
 }

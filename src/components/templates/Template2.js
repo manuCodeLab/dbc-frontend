@@ -11,10 +11,18 @@ const COLORS = {
   textSecondary: "#CCCCCC"
 };
 
-export default function Template2({ cardData = {}, thumbnail = false }) {
-  const fullName = cardData?.fullName || 'Sarah Smith';
-  const jobTitle = cardData?.jobTitle || 'Professional';
-  const handle = cardData?.handle || '@sarahsmith';
+export default function Template2({ cardData = {}, userData = {}, dashboardData = {}, thumbnail = false }) {
+  const fullName = dashboardData?.fullName || 
+                   `${userData?.first || ''} ${userData?.last || ''}`.trim() || 
+                   cardData?.fullName || 'Sarah Smith';
+  
+  const designation = dashboardData?.designation || cardData?.jobTitle || 'Professional';
+  const email = dashboardData?.email || userData?.email || cardData?.email || '';
+  const phone = dashboardData?.phone1 || cardData?.phone || '';
+  const linkedin = cardData?.linkedin || '';
+  const twitter = cardData?.twitter || '';
+  const instagram = cardData?.instagram || '';
+  const website = cardData?.website || '';
 
   if (thumbnail) {
     return (
@@ -23,7 +31,7 @@ export default function Template2({ cardData = {}, thumbnail = false }) {
           <Text style={{ color: COLORS.background, fontWeight: '700' }}>{fullName.charAt(0).toUpperCase()}</Text>
         </View>
         <Text numberOfLines={1} style={{ color: COLORS.textPrimary, fontSize: 12, fontWeight: '700' }}>{fullName}</Text>
-        <Text numberOfLines={1} style={{ color: COLORS.textSecondary, fontSize: 9 }}>{jobTitle}</Text>
+        {designation && <Text numberOfLines={1} style={{ color: COLORS.textSecondary, fontSize: 9 }}>{designation}</Text>}
       </View>
     );
   }
@@ -72,8 +80,30 @@ export default function Template2({ cardData = {}, thumbnail = false }) {
           color: COLORS.textSecondary,
           marginBottom: 24
         }}>
-          {jobTitle}
+          {designation}
         </Text>
+
+        {/* Email and Phone */}
+        {email && (
+          <Text style={{
+            fontSize: 12,
+            color: COLORS.textSecondary,
+            marginBottom: 4,
+            textAlign: 'center'
+          }}>
+            {email}
+          </Text>
+        )}
+        {phone && (
+          <Text style={{
+            fontSize: 12,
+            color: COLORS.textSecondary,
+            marginBottom: 24,
+            textAlign: 'center'
+          }}>
+            {phone}
+          </Text>
+        )}
 
         {/* Social Icons Row */}
         <View style={{
@@ -82,10 +112,10 @@ export default function Template2({ cardData = {}, thumbnail = false }) {
           alignItems: 'center',
           gap: 20
         }}>
-          <MaterialCommunityIcons name="linkedin" size={28} color={COLORS.primary} />
-          <MaterialCommunityIcons name="twitter" size={28} color={COLORS.primary} />
-          <MaterialCommunityIcons name="instagram" size={28} color={COLORS.primary} />
-          <MaterialCommunityIcons name="github" size={28} color={COLORS.primary} />
+          {linkedin && <MaterialCommunityIcons name="linkedin" size={28} color={COLORS.primary} />}
+          {twitter && <MaterialCommunityIcons name="twitter" size={28} color={COLORS.primary} />}
+          {instagram && <MaterialCommunityIcons name="instagram" size={28} color={COLORS.primary} />}
+          {website && <MaterialCommunityIcons name="globe" size={28} color={COLORS.primary} />}
         </View>
       </View>
     </View>

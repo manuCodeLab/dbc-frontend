@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { layoutStyles } from '../../styles/screens/businessDetailsStyles';
 import { formStyles } from '../../styles/screens/businessDetailsStyles';
 import { getCardDraft, saveCardDraft } from '../../utils/storage';
+import Footer from '../../components/common/Footer';
 
 // Validation rules for Business Details
 const validations = {
@@ -165,7 +166,7 @@ export default function BusinessDetailsScreen({ navigation }) {
         } catch (e) {
           console.warn('save draft failed', e);
         }
-        navigation.navigate('SocialMediaScreen');
+        navigation.navigate('SocialMedia');
       })();
     } else {
       Alert.alert('Validation Error', 'Please fix all errors before proceeding');
@@ -374,6 +375,7 @@ export default function BusinessDetailsScreen({ navigation }) {
 
       <View style={{ height: 30 }} />
       </ScrollView>
+      <Footer activeTab="" navigation={navigation} fromScreen="BusinessDetails" />
     </SafeAreaView>
   );
 }

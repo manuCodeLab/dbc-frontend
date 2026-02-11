@@ -1,33 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
-import { getCardDraft } from '../../utils/storage';
+import { getCardDraft, getUser, getDashboard } from '../../utils/storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import styles from '../../styles/screens/templatePreviewStyles';
 import COLORS from '../../styles/colors';
+import Footer from '../../components/common/Footer';
 
 import Template1 from '../../components/templates/Template1';
 import Template2 from '../../components/templates/Template2';
 import Template3 from '../../components/templates/Template3';
 import Template4 from '../../components/templates/Template4';
-import Template5 from '../../components/templates/Template5';
-import Template6 from '../../components/templates/Template6';
-import Template7 from '../../components/templates/Template7';
 
 const templates = [
   { id: 1, name: 'Glass', component: Template1 },
   { id: 2, name: 'Minimal', component: Template2 },
   { id: 3, name: 'Modern', component: Template3 },
   { id: 4, name: 'Bold', component: Template4 },
-  { id: 5, name: 'Sage', component: Template5 },
-  { id: 6, name: 'Network', component: Template6 },
-  { id: 7, name: 'Artist', component: Template7 },
 ];
 
 export default function TemplatePreviewScreen({ route, navigation }) {
   const templateId = route.params?.templateId || 1;
   const cardDataFromRoute = route.params?.cardData || {};
   const [cardData, setCardData] = useState(cardDataFromRoute || {});
+  const [userData, setUserData] = useState({});
+  const [dashboardData, setDashboardData] = useState({});
   const currentTemplateInfo = templates.find(t => t.id === templateId);
   const CurrentTemplate = currentTemplateInfo?.component;
 
@@ -35,6 +32,19 @@ export default function TemplatePreviewScreen({ route, navigation }) {
     let mounted = true;
     const load = async () => {
       try {
+        // Load user data
+        const user = await getUser();
+        if (mounted && user) {
+          setUserData(user);
+        }
+
+        // Load dashboard data
+        const dashboard = await getDashboard();
+        if (mounted && dashboard) {
+          setDashboardData(dashboard);
+        }
+        
+        // Load card data
         if (!cardDataFromRoute || Object.keys(cardDataFromRoute).length === 0) {
           const draft = await getCardDraft();
           if (mounted && draft && Object.keys(draft).length) {
@@ -67,6 +77,19 @@ export default function TemplatePreviewScreen({ route, navigation }) {
     // TODO: Implement share card
   };
 
+  const handleProfilePress = () => {
+    navigation.navigate('Profile');
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    const fullName = dashboardData?.fullName || `${userData?.first || ''}`;
+    if (fullName && fullName.trim()) {
+      return fullName.trim().charAt(0).toUpperCase();
+    }
+    return 'N';
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#F5F5F5" />
@@ -80,15 +103,18 @@ export default function TemplatePreviewScreen({ route, navigation }) {
               <Ionicons name="card" size={28} color={COLORS.accent} />
               <Text style={styles.appTitle}>DIGITAL BUSINESS CARD</Text>
             </View>
-            <View style={styles.avatarCircle}>
-              <Text style={styles.avatarText}>{cardData?.fullName?.charAt(0)?.toUpperCase() || 'N'}</Text>
-            </View>
+            <TouchableOpacity 
+              style={styles.avatarCircle}
+              onPress={handleProfilePress}
+            >
+              <Text style={styles.avatarText}>{getUserInitials()}</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.cardContainer}>
           <View style={styles.cardPreview}>
-            {CurrentTemplate && <CurrentTemplate cardData={cardData} />}
+            {CurrentTemplate && <CurrentTemplate cardData={cardData} userData={userData} dashboardData={dashboardData} />}
           </View>
         </View>
 
@@ -125,6 +151,7 @@ export default function TemplatePreviewScreen({ route, navigation }) {
         </View>
 
       </ScrollView>
+      <Footer activeTab="profile" navigation={navigation} fromScreen="TemplatePreview" />
     </SafeAreaView>
   );
 }

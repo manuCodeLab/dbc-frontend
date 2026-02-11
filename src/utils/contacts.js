@@ -78,12 +78,7 @@ export const compareContactsWithUsers = (phoneContacts, dbcUsers) => {
 export const getDBCUsers = async () => {
   try {
     // In production, fetch from backend or local storage
-    // For now, return mock DBC users for demo
-    return [
-      { name: 'Rahul Singh', phone: '9876543210', card: 'Premium' },
-      { name: 'Priya Sharma', phone: '9765432109', card: 'Basic' },
-      { name: 'Amit Kumar', phone: '9654321098', card: 'Premium' },
-    ];
+    return [];
   } catch (error) {
     console.error('Error getting DBC users:', error);
     return [];

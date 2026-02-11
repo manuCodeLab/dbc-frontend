@@ -10,12 +10,18 @@ const COLORS = {
   textSecondary: "#AAAAAA"
 };
 
-export default function Template3({ cardData = {}, thumbnail = false }) {
-  const fullName = cardData?.fullName || 'Alexandra Gold';
-  const jobTitle = cardData?.jobTitle || 'Executive';
-  const phone = cardData?.phone || '+1 (555) 000-0000';
-  const email = cardData?.email || 'alex@example.com';
-  const location = cardData?.location || 'New York, NY';
+export default function Template3({ cardData = {}, userData = {}, dashboardData = {}, thumbnail = false }) {
+  const fullName = dashboardData?.fullName || 
+                   `${userData?.first || ''} ${userData?.last || ''}`.trim() || 
+                   cardData?.fullName || 'Alexandra Gold';
+  
+  const designation = (dashboardData?.designation && dashboardData.designation.trim()) || (cardData?.jobTitle && cardData.jobTitle.trim()) || '';
+  const phone = (dashboardData?.phone1 && dashboardData.phone1.trim()) || (cardData?.phone && cardData.phone.trim()) || '';
+  const email = (dashboardData?.email && dashboardData.email.trim()) || (userData?.email && userData.email.trim()) || (cardData?.email && cardData.email.trim()) || '';
+  const company = (cardData?.companyName && cardData.companyName.trim()) || '';
+  const city = (cardData?.city && cardData.city.trim()) || '';
+  const state = (cardData?.state && cardData.state.trim()) || '';
+  const location = city && state ? `${city}, ${state}` : (cardData?.address && cardData.address.trim()) || '';
 
   if (thumbnail) {
     return (
@@ -23,7 +29,7 @@ export default function Template3({ cardData = {}, thumbnail = false }) {
         <Text numberOfLines={1} style={{ color: COLORS.textPrimary, fontSize: 12, fontWeight: '700', textAlign: 'center' }}>{fullName}</Text>
         <View style={{ height: 6 }} />
         <View style={{ width: 40, height: 2, backgroundColor: COLORS.primary, marginBottom: 6 }} />
-        <Text numberOfLines={1} style={{ color: COLORS.primary, fontSize: 9 }}>{jobTitle}</Text>
+        {designation && <Text numberOfLines={1} style={{ color: COLORS.primary, fontSize: 9 }}>{designation}</Text>}
       </View>
     );
   }
@@ -64,37 +70,54 @@ export default function Template3({ cardData = {}, thumbnail = false }) {
           marginBottom: 16,
           textAlign: 'center'
         }}>
-          {jobTitle}
+          {designation}
         </Text>
+
+        {company && (
+          <Text style={{
+            fontSize: 13,
+            color: COLORS.textSecondary,
+            marginBottom: 12,
+            textAlign: 'center'
+          }}>
+            {company}
+          </Text>
+        )}
 
         {/* Phone */}
-        <Text style={{
-          fontSize: 13,
-          color: COLORS.textSecondary,
-          marginBottom: 8,
-          textAlign: 'center'
-        }}>
-          {phone}
-        </Text>
+        {phone && (
+          <Text style={{
+            fontSize: 13,
+            color: COLORS.textSecondary,
+            marginBottom: 8,
+            textAlign: 'center'
+          }}>
+            {phone}
+          </Text>
+        )}
 
         {/* Email */}
-        <Text style={{
-          fontSize: 13,
-          color: COLORS.textSecondary,
-          marginBottom: 8,
-          textAlign: 'center'
-        }}>
-          {email}
-        </Text>
+        {email && (
+          <Text style={{
+            fontSize: 13,
+            color: COLORS.textSecondary,
+            marginBottom: 8,
+            textAlign: 'center'
+          }}>
+            {email}
+          </Text>
+        )}
 
-        {/* Website */}
-        <Text style={{
-          fontSize: 13,
-          color: COLORS.primary,
-          textAlign: 'center'
-        }}>
-          {location}
-        </Text>
+        {/* Location */}
+        {location && (
+          <Text style={{
+            fontSize: 13,
+            color: COLORS.primary,
+            textAlign: 'center'
+          }}>
+            {location}
+          </Text>
+        )}
       </View>
     </View>
   );

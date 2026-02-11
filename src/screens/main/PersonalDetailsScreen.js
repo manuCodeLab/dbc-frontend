@@ -11,9 +11,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
-import { layoutStyles } from '../../styles/screens/dashboardLayoutStyles';
-import { formStyles } from '../../styles/screens/dashboardFormStyles';
-import { getUser } from '../../utils/storage';
+import { layoutStyles } from '../../styles/screens/personalDetailsLayoutStyles';
+import { formStyles } from '../../styles/screens/personalDetailsFormStyles';
+import { getUser, saveDashboard } from '../../utils/storage';
+import Footer from '../../components/common/Footer';
 
 // Validation rules
 const validations = {
@@ -65,7 +66,7 @@ const validate = {
   },
 };
 
-export default function DashboardScreen({ navigation }) {
+export default function PersonalDetailsScreen({ navigation }) {
   const [formData, setFormData] = useState({
     fullName: '',
     designation: '',
@@ -331,8 +332,9 @@ export default function DashboardScreen({ navigation }) {
         {/* Save Button */}
         <TouchableOpacity 
           style={layoutStyles.saveButton}
-          onPress={() => {
+          onPress={async () => {
             if (validateAllFields()) {
+              await saveDashboard(formData);
               navigateToBusinessDetails();
             }
           }}
@@ -353,6 +355,7 @@ export default function DashboardScreen({ navigation }) {
 
       <View style={{ height: 30 }} />
       </ScrollView>
+      <Footer activeTab="" navigation={navigation} fromScreen="PersonalDetails" />
     </SafeAreaView>
   );
 }

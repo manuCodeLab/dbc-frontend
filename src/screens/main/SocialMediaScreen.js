@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { layoutStyles } from '../../styles/screens/socialMediaStyles';
 import { formStyles } from '../../styles/screens/socialMediaStyles';
 import { getCardDraft, saveCardDraft, clearCardDraft } from '../../utils/storage';
+import Footer from '../../components/common/Footer';
 
 // Validation rules for Social Media
 const validations = {
@@ -387,6 +388,7 @@ export default function SocialMediaScreen({ navigation }) {
 
       <View style={{ height: 30 }} />
       </ScrollView>
+      <Footer activeTab="" navigation={navigation} fromScreen="SocialMedia" />
     </SafeAreaView>
   );
 }

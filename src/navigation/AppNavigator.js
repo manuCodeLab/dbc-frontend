@@ -8,7 +8,7 @@ import LocationPermissionScreen from '../screens/auth/LocationPermissionScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignupScreen from '../screens/auth/SignupScreen';
 import LandingScreen from '../screens/main/LandingScreen';
-import DashboardScreen from '../screens/main/DashboardScreen';
+import PersonalDetailsScreen from '../screens/main/PersonalDetailsScreen';
 import BusinessDetailsScreen from '../screens/main/BusinessDetailsScreen';
 import SocialMediaScreen from '../screens/main/SocialMediaScreen';
 import SelectTemplateScreen from '../screens/main/SelectTemplateScreen';
@@ -59,7 +59,7 @@ function DashboardTabs() {
     >
       <Tab.Screen 
         name="Home" 
-        component={DashboardScreen}
+        component={PersonalDetailsScreen}
         options={{
           tabBarLabel: 'Home',
         }}
@@ -94,12 +94,15 @@ export default function AppNavigator() {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
       <Stack.Screen name="Landing" component={LandingScreen} />
+      <Stack.Screen name="PersonalDetails" component={PersonalDetailsScreen} />
+      <Stack.Screen name="BusinessDetails" component={BusinessDetailsScreen} />
+      <Stack.Screen name="SocialMedia" component={SocialMediaScreen} />
       <Stack.Screen name="SelectTemplate" component={SelectTemplateScreen} />
       <Stack.Screen name="TemplatePreview" component={TemplatePreviewScreen} />
       <Stack.Screen name="CreateCardPersonal" component={CreateCardPersonal} />
+      <Stack.Screen name="Contacts" component={ContactsScreen} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Dashboard" component={DashboardTabs} />
-      <Stack.Screen name="BusinessDetails" component={BusinessDetailsScreen} />
-      <Stack.Screen name="SocialMediaScreen" component={SocialMediaScreen} />
     </Stack.Navigator>
   );
 }

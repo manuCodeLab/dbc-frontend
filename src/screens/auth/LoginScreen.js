@@ -20,12 +20,19 @@ import { getUser, saveUser } from '../../utils/storage';
 
 const { width } = Dimensions.get('window');
 
+// Generate random OTP
+const generateOTP = (length = 4) => {
+  return Math.floor(Math.pow(10, length - 1) + Math.random() * (Math.pow(10, length) - Math.pow(10, length - 1)));
+};
+
 export default function LoginScreen({ navigation }) {
   const [phone, setPhone] = useState('');
   const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '']);
+  const [generatedOtp, setGeneratedOtp] = useState('');
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [wrongOtpCooldown, setWrongOtpCooldown] = useState(0);
   const inputs = useRef([]);
 
   useEffect(() => {
@@ -37,6 +44,14 @@ export default function LoginScreen({ navigation }) {
     return () => clearInterval(interval);
   }, [otpSent, timer]);
 
+  useEffect(() => {
+    let cooldownInterval;
+    if (wrongOtpCooldown > 0) {
+      cooldownInterval = setInterval(() => setWrongOtpCooldown((t) => t - 1), 1000);
+    }
+    return () => clearInterval(cooldownInterval);
+  }, [wrongOtpCooldown]);
+
   // Only Indian 10 digit numbers while typing
   const handlePhoneChange = (text) => {
     let cleaned = text.replace(/\D/g, '');
@@ -44,8 +59,13 @@ export default function LoginScreen({ navigation }) {
     setPhone(cleaned);
   };
 
-  // Send OTP (Dummy)
+  // Send OTP (Random Generated)
   const handleSendOtp = () => {
+    if (wrongOtpCooldown > 0) {
+      Alert.alert('Please Wait', `You can send OTP again in ${wrongOtpCooldown} seconds`);
+      return;
+    }
+    
     if (!/^[1-9]\d{9}$/.test(phone)) {
       Alert.alert(
         'Invalid Number',
@@ -54,16 +74,21 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
-    Alert.alert('OTP Sent ✅', 'Your dummy OTP is: 123456');
+    const randomOtp = generateOTP().toString();
+    setGeneratedOtp(randomOtp);
+    Alert.alert('OTP Sent ✅', `Your OTP is: ${randomOtp}`);
 
     setOtpSent(true);
     setTimer(30);
     setCanResend(false);
+    setWrongOtpCooldown(0);
   };
 
   const handleResendOtp = () => {
     if (!canResend) return;
-    Alert.alert('OTP Resent ✅', 'Your dummy OTP is: 123456');
+    const randomOtp = generateOTP().toString();
+    setGeneratedOtp(randomOtp);
+    Alert.alert('OTP Resent ✅', `Your OTP is: ${randomOtp}`);
     setTimer(30);
     setCanResend(false);
   };
@@ -72,19 +97,19 @@ export default function LoginScreen({ navigation }) {
     const copy = [...otp];
     copy[index] = val;
     setOtp(copy);
-    if (val && index < 5) inputs.current[index + 1].focus();
+    if (val && index < 3) inputs.current[index + 1].focus();
   };
 
   // 🔁 Reset OTP boxes on wrong OTP
   const resetOtpBoxes = () => {
-    setOtp(['', '', '', '', '', '']);
+    setOtp(['', '', '', '']);
     setTimeout(() => {
       inputs.current[0]?.focus();
     }, 100);
   };
 
   const handleLogin = async () => {
-    if (otp.join('') === '123456') {
+    if (otp.join('') === generatedOtp) {
       try {
         // Verify user exists in storage
         const user = await getUser();
@@ -110,8 +135,9 @@ export default function LoginScreen({ navigation }) {
         resetOtpBoxes();
       }
     } else {
-      Alert.alert('Wrong OTP ❌', 'Enter 123456');
       resetOtpBoxes();
+      setWrongOtpCooldown(30);
+      Alert.alert('Wrong OTP ❌', 'Entered OTP is incorrect. Try again after 30 seconds');
     }
   };
 
@@ -166,7 +192,7 @@ export default function LoginScreen({ navigation }) {
                           setOtp(copy);
 
                           // Move forward
-                          if (v && i < 5) {
+                          if (v && i < 3) {
                             inputs.current[i + 1].focus();
                           }
                         }}

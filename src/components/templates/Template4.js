@@ -10,11 +10,20 @@ const COLORS = {
   textSecondary: "#999999"
 };
 
-export default function Template4({ cardData = {}, thumbnail = false }) {
-  const fullName = cardData?.fullName || 'John Developer';
-  const jobTitle = cardData?.jobTitle || 'Developer';
-  const email = cardData?.email || 'john@example.com';
-  const phone = cardData?.phone || '+1 (555) 000-0000';
+export default function Template4({ cardData = {}, userData = {}, dashboardData = {}, thumbnail = false }) {
+  const fullName = dashboardData?.fullName || 
+                   `${userData?.first || ''} ${userData?.last || ''}`.trim() || 
+                   cardData?.fullName || 'John Developer';
+  
+  const designation = (dashboardData?.designation && dashboardData.designation.trim()) || (cardData?.jobTitle && cardData.jobTitle.trim()) || '';
+  const email = (dashboardData?.email && dashboardData.email.trim()) || (userData?.email && userData.email.trim()) || (cardData?.email && cardData.email.trim()) || '';
+  const phone = (dashboardData?.phone1 && dashboardData.phone1.trim()) || (cardData?.phone && cardData.phone.trim()) || '';
+  const company = (cardData?.companyName && cardData.companyName.trim()) || '';
+  const whatsapp = (cardData?.whatsapp && cardData.whatsapp.trim()) || '';
+  const linkedin = (cardData?.linkedin && cardData.linkedin.trim()) || '';
+  const instagram = (cardData?.instagram && cardData.instagram.trim()) || '';
+  const twitter = (cardData?.twitter && cardData.twitter.trim()) || '';
+  const website = (cardData?.website && cardData.website.trim()) || '';
 
   // Extract initials from full name
   const getInitials = (name) => {
@@ -33,7 +42,7 @@ export default function Template4({ cardData = {}, thumbnail = false }) {
           <Text style={{ color: COLORS.textPrimary, fontWeight: '700' }}>{getInitials(fullName)}</Text>
         </View>
         <Text numberOfLines={1} style={{ color: COLORS.textPrimary, fontSize: 12, fontWeight: '700' }}>{fullName}</Text>
-        <Text numberOfLines={1} style={{ color: COLORS.primary, fontSize: 9 }}>{jobTitle}</Text>
+        {designation && <Text numberOfLines={1} style={{ color: COLORS.primary, fontSize: 9 }}>{designation}</Text>}
       </View>
     );
   }
@@ -81,27 +90,41 @@ export default function Template4({ cardData = {}, thumbnail = false }) {
           fontSize: 14,
           color: COLORS.primary,
           fontWeight: '600',
-          marginBottom: 24
+          marginBottom: 8
         }}>
-          {jobTitle}
+          {designation}
         </Text>
+
+        {company && (
+          <Text style={{
+            fontSize: 13,
+            color: COLORS.textSecondary,
+            marginBottom: 16
+          }}>
+            {company}
+          </Text>
+        )}
 
         {/* Phone */}
-        <Text style={{
-          fontSize: 13,
-          color: COLORS.textSecondary,
-          marginBottom: 6
-        }}>
-          {phone}
-        </Text>
+        {phone && (
+          <Text style={{
+            fontSize: 13,
+            color: COLORS.textSecondary,
+            marginBottom: 6
+          }}>
+            {phone}
+          </Text>
+        )}
 
         {/* Email */}
-        <Text style={{
-          fontSize: 13,
-          color: COLORS.textSecondary
-        }}>
-          {email}
-        </Text>
+        {email && (
+          <Text style={{
+            fontSize: 13,
+            color: COLORS.textSecondary
+          }}>
+            {email}
+          </Text>
+        )}
       </View>
     </View>
   );

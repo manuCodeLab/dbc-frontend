@@ -4,14 +4,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colorsDefault from "../../styles/colors";
 import styles from "../../styles/screens/selectTemplateStyles";
+import Footer from '../../components/common/Footer';
 
 import Template1 from "../../components/templates/Template1";
 import Template2 from "../../components/templates/Template2";
 import Template3 from "../../components/templates/Template3";
 import Template4 from "../../components/templates/Template4";
-import Template5 from "../../components/templates/Template5";
-import Template6 from "../../components/templates/Template6";
-import Template7 from "../../components/templates/Template7";
 
 export default function SelectTemplateScreen({ route, navigation }) {
   const [selected, setSelected] = useState(null);
@@ -37,9 +35,6 @@ export default function SelectTemplateScreen({ route, navigation }) {
     { id: 2, name: 'Minimal', component: Template2 },
     { id: 3, name: 'Modern', component: Template3 },
     { id: 4, name: 'Bold', component: Template4 },
-    { id: 5, name: 'Sage', component: Template5 },
-    { id: 6, name: 'Network', component: Template6 },
-    { id: 7, name: 'Artist', component: Template7 },
   ];
 
   return (
@@ -108,6 +103,7 @@ export default function SelectTemplateScreen({ route, navigation }) {
           </View>
         </TouchableOpacity>
       </View>
+      <Footer activeTab="" navigation={navigation} fromScreen="SelectTemplate" />
     </SafeAreaView>
   );
 }

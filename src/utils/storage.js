@@ -26,3 +26,17 @@ export const getCardDraft = async () => {
 export const clearCardDraft = async () => {
   await AsyncStorage.removeItem('CARD_DRAFT');
 };
+
+// Dashboard data helpers
+export const saveDashboard = async (dashboard) => {
+  await AsyncStorage.setItem('DASHBOARD', JSON.stringify(dashboard));
+};
+
+export const getDashboard = async () => {
+  const data = await AsyncStorage.getItem('DASHBOARD');
+  return data ? JSON.parse(data) : null;
+};
+
+export const clearDashboard = async () => {
+  await AsyncStorage.removeItem('DASHBOARD');
+};

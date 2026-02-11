@@ -164,4 +164,101 @@ export default StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
   },
+
+  userInfoSection: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E8E8E8',
+  },
+
+  userInfoTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#333333',
+    marginBottom: 12,
+  },
+
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+
+  infoLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666666',
+    minWidth: 80,
+  },
+
+  infoValue: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333333',
+    flex: 1,
+    textAlign: 'right',
+    paddingLeft: 10,
+  },
+
+  businessInfoSection: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E8E8E8',
+  },
+
+  businessInfoTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#333333',
+    marginBottom: 12,
+  },
+
+  socialInfoSection: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E8E8E8',
+  },
+
+  socialInfoTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#333333',
+    marginBottom: 12,
+  },
+
+  dashboardInfoSection: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E8E8E8',
+  },
+
+  dashboardInfoTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#333333',
+    marginBottom: 12,
+  },
 });

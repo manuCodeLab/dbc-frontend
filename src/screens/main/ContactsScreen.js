@@ -19,6 +19,7 @@ import {
   compareContactsWithUsers,
   getDBCUsers,
 } from '../../utils/contacts';
+import Footer from '../../components/common/Footer';
 
 export default function ContactsScreen({ navigation }) {
   const [contacts, setContacts] = useState([]);
@@ -288,6 +289,7 @@ export default function ContactsScreen({ navigation }) {
           )}
         </ScrollView>
       )}
+      <Footer activeTab="contacts" navigation={navigation} fromScreen="Contacts" />
     </SafeAreaView>
   );
 }
