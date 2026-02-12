@@ -1,129 +1,141 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
+import styles from '../../styles/templates/classicStyles';
 
-const ClassicTemplate = ({ userData, isSelected }) => {
-  const { name, title, email, phone, company, website } = userData;
+const ClassicTemplate = ({ data, userData, isSelected }) => {
+  // Support both 'data' (from TemplatePreviewScreen) and 'userData' (from SelectTemplateScreen)
+  const cardData = data || userData || {};
+  
+  const {
+    name = 'John Doe',
+    designation = 'Business Title',
+    company = 'Company Name',
+    phone = '+1 (555) 123-4567',
+    email = 'email@example.com',
+    website = 'www.example.com',
+    linkedin = '',
+    instagram = '',
+    twitter = '',
+  } = cardData;
 
-  return (
-    <View style={[styles.container, isSelected && styles.selected]}>
-      <View style={styles.header}>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>Classic</Text>
+  // If this is being used for template selection (isSelected prop exists)
+  if (isSelected !== undefined) {
+    return (
+      <View style={[styles.selectionContainer, isSelected && styles.selected]}>
+        <View style={styles.selectionHeader}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>Classic</Text>
+          </View>
         </View>
+
+        <View style={styles.selectionContent}>
+          <Text style={styles.selectionName}>{name}</Text>
+          <Text style={styles.selectionTitle}>{designation}</Text>
+
+          <View style={styles.divider} />
+
+          <View style={styles.selectionSection}>
+            <Text style={styles.label}>Company</Text>
+            <Text style={styles.selectionValue}>{company}</Text>
+          </View>
+
+          <View style={styles.selectionSection}>
+            <Text style={styles.label}>Email</Text>
+            <Text style={styles.selectionValue}>{email}</Text>
+          </View>
+
+          <View style={styles.selectionSection}>
+            <Text style={styles.label}>Phone</Text>
+            <Text style={styles.selectionValue}>{phone}</Text>
+          </View>
+
+          {website && (
+            <View style={styles.selectionSection}>
+              <Text style={styles.label}>Website</Text>
+              <Text style={styles.selectionValue}>{website}</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.footer} />
+      </View>
+    );
+  }
+
+  // Preview mode (used in TemplatePreviewScreen)
+  return (
+    <View style={styles.card}>
+      {/* Header Background */}
+      <View style={styles.headerBackground} />
+
+      {/* Profile Section */}
+      <View style={styles.profileSection}>
+        {/* Profile Image Placeholder */}
+        <View style={styles.profileImageContainer}>
+          <Text style={styles.profileImagePlaceholder}>👤</Text>
+        </View>
+
+        {/* Name and Designation */}
+        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.designation}>{designation}</Text>
+        {company && <Text style={styles.company}>{company}</Text>}
       </View>
 
-      <View style={styles.content}>
-        <Text style={styles.name}>{name || 'John Doe'}</Text>
-        <Text style={styles.title}>{title || 'Business Title'}</Text>
+      {/* Details Section */}
+      <View style={styles.detailsSection}>
+        {/* Contact Information */}
+        <View style={styles.contactInfo}>
+          {phone && (
+            <View style={styles.contactItem}>
+              <Text style={styles.label}>Phone</Text>
+              <Text style={styles.contactValue}>{phone}</Text>
+            </View>
+          )}
 
-        <View style={styles.divider} />
+          {email && (
+            <View style={styles.contactItem}>
+              <Text style={styles.label}>Email</Text>
+              <Text style={styles.contactValue}>{email}</Text>
+            </View>
+          )}
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Company</Text>
-          <Text style={styles.value}>{company || 'Your Company'}</Text>
+          {website && (
+            <View style={styles.contactItem}>
+              <Text style={styles.label}>Website</Text>
+              <Text style={styles.contactValue}>{website}</Text>
+            </View>
+          )}
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Email</Text>
-          <Text style={styles.value}>{email || 'email@example.com'}</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.label}>Phone</Text>
-          <Text style={styles.value}>{phone || '+1 (555) 000-0000'}</Text>
-        </View>
-
-        {website && (
-          <View style={styles.section}>
-            <Text style={styles.label}>Website</Text>
-            <Text style={styles.value}>{website}</Text>
+        {/* Social Media Links */}
+        {(linkedin || instagram || twitter) && (
+          <View style={styles.socialMediaSection}>
+            <Text style={styles.socialLabel}>Connect</Text>
+            <View style={styles.socialLinksContainer}>
+              {linkedin && (
+                <View style={styles.socialLink}>
+                  <Text style={styles.socialIconLabel}>in</Text>
+                  <Text style={styles.socialText}>{linkedin}</Text>
+                </View>
+              )}
+              {instagram && (
+                <View style={styles.socialLink}>
+                  <Text style={styles.socialIconLabel}>ig</Text>
+                  <Text style={styles.socialText}>{instagram}</Text>
+                </View>
+              )}
+              {twitter && (
+                <View style={styles.socialLink}>
+                  <Text style={styles.socialIconLabel}>𝕏</Text>
+                  <Text style={styles.socialText}>{twitter}</Text>
+                </View>
+              )}
+            </View>
           </View>
         )}
       </View>
-
-      <View style={styles.footer} />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    width: 280,
-    height: 440,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#E0E0E0',
-    overflow: 'hidden',
-    marginHorizontal: 8,
-  },
-  selected: {
-    borderColor: '#2E7D32',
-    borderWidth: 3,
-    shadowColor: '#2E7D32',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  header: {
-    backgroundColor: '#1565C0',
-    height: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  badge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  badgeText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  content: {
-    flex: 1,
-    padding: 16,
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1F1F1F',
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#1565C0',
-    marginBottom: 12,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#E0E0E0',
-    marginVertical: 12,
-  },
-  section: {
-    marginBottom: 10,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#757575',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 2,
-  },
-  value: {
-    fontSize: 12,
-    color: '#424242',
-    lineHeight: 16,
-  },
-  footer: {
-    height: 8,
-    backgroundColor: '#1565C0',
-  },
-});
 
 export default ClassicTemplate;

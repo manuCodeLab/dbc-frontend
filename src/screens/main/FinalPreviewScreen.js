@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,17 @@ import {
   SafeAreaView,
   ScrollView,
   Share,
+  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ClassicTemplate from '../../components/templates/ClassicTemplate';
 import ModernTemplate from '../../components/templates/ModernTemplate';
 import MinimalTemplate from '../../components/templates/MinimalTemplate';
 import DarkTemplate from '../../components/templates/DarkTemplate';
+import Footer from '../../components/common/Footer';
+import { layoutStyles } from '../../styles/screens/personalDetailsLayoutStyles';
+import { getUser } from '../../utils/storage';
+
 
 const TEMPLATE_COMPONENTS = {
   classic: ClassicTemplate,
@@ -25,6 +30,27 @@ const TEMPLATE_COMPONENTS = {
 export default function FinalPreviewScreen({ route, navigation }) {
   const { selectedTemplate, userData: routeUserData } = route?.params || {};
   const [userData, setUserData] = useState(routeUserData || {});
+  const [userInitial, setUserInitial] = useState('N');
+
+  useEffect(() => {
+    let mounted = true;
+    const loadUser = async () => {
+      try {
+        const user = await getUser();
+        if (mounted && user) {
+          const name = user.first || user.fullName || user.firstName || '';
+          const initial = name && name.trim().length ? name.trim().charAt(0).toUpperCase() : 'N';
+          setUserInitial(initial);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    loadUser();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Load real user data from storage if not provided in route
   React.useEffect(() => {
@@ -108,23 +134,46 @@ export default function FinalPreviewScreen({ route, navigation }) {
     });
   }, [finalUserData, navigation]);
 
+  const navigateToProfile = () => {
+    navigation.navigate('Profile');
+  };
+
+  const handleBack = () => {
+    navigation.goBack();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      
+      {/* ========== HEADER SECTION ========== */}
+      <View style={layoutStyles.headerSection}>
+        {/* Back Button */}
+        <TouchableOpacity 
+          onPress={handleBack}
+          style={{ width: 24, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Ionicons name="chevron-back" size={28} color="#D4AF37" />
+        </TouchableOpacity>
+
+        {/* App Title */}
+        <Text style={layoutStyles.appTitle}>
+          DIGITAL BUSINESS CARD
+        </Text>
+
+        {/* Profile Icon */}
+        <TouchableOpacity 
+          style={layoutStyles.profileIcon}
+          onPress={navigateToProfile}
+        >
+          <Text style={layoutStyles.profileIconText}>{userInitial}</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Ionicons name="chevron-back" size={24} color="#D4AF37" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Your Card Preview</Text>
-          <View style={{ width: 30 }} />
-        </View>
 
         {/* Template Name */}
         <View style={styles.templateNameSection}>
@@ -234,6 +283,7 @@ export default function FinalPreviewScreen({ route, navigation }) {
           </View>
         </View>
       </ScrollView>
+      <Footer activeTab="" navigation={navigation} fromScreen="FinalPreview" />
     </SafeAreaView>
   );
 }

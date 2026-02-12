@@ -1,6 +1,131 @@
 import { StyleSheet } from 'react-native';
+import { COLORS } from '../colors';
 
-// ========== LAYOUT STYLES ==========
+export const businessDetailsStyles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  flex: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 40,
+  },
+  container: {
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+  },
+
+  /* FIELD WRAPPER */
+  fieldWrapper: {
+    marginBottom: 20,
+  },
+
+  /* LABEL ROW */
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+
+  labelLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  label: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+
+  star: {
+    color: '#FF0000',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+
+  errorText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#FF0000',
+  },
+
+  /* INPUT FIELD */
+  input: {
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    color: COLORS.text,
+    fontWeight: '500',
+  },
+
+  inputError: {
+    borderColor: '#FF0000',
+    borderWidth: 1.5,
+  },
+
+  multilineInput: {
+    paddingTop: 12,
+    height: 120,
+    textAlignVertical: 'top',
+  },
+
+  /* PDF BUTTON */
+  pdfButton: {
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1.5,
+    borderColor: COLORS.accent,
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  pdfButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.accent,
+    marginLeft: 10,
+  },
+
+  /* PDF FILE INFO */
+  pdfFileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: '#F0FDF4',
+    borderRadius: 8,
+  },
+
+  pdfFileName: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#15803d',
+    marginLeft: 8,
+    flex: 1,
+  },
+
+  /* BUTTON CONTAINER */
+  buttonContainer: {
+    paddingHorizontal: 20,
+    marginTop: 20,
+    marginBottom: 20,
+  },
+});
+
+// Keep old exports for backward compatibility
 export const layoutStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -8,8 +133,6 @@ export const layoutStyles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingTop: 0,
   },
-
-  // ========== HEADER SECTION ==========
   headerSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -25,13 +148,11 @@ export const layoutStyles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
   },
-
   backButton: {
     padding: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   appTitle: {
     color: '#0F0F0F',
     fontSize: 14,
@@ -41,7 +162,6 @@ export const layoutStyles = StyleSheet.create({
     textAlign: 'center',
     flex: 1,
   },
-
   stepIndicator: {
     width: 50,
     height: 50,
@@ -57,14 +177,11 @@ export const layoutStyles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
   },
-
   stepText: {
     color: '#0F0F0F',
     fontSize: 22,
     fontWeight: '700',
   },
-
-  // ========== TITLE SECTION ==========
   titleSection: {
     paddingHorizontal: 20,
     paddingVertical: 28,
@@ -72,7 +189,6 @@ export const layoutStyles = StyleSheet.create({
     borderTopWidth: 3,
     borderTopColor: '#D4AF37',
   },
-
   mainTitle: {
     color: '#0F0F0F',
     fontSize: 28,
@@ -80,7 +196,6 @@ export const layoutStyles = StyleSheet.create({
     marginBottom: 8,
     textAlign: 'center',
   },
-
   subtitle: {
     color: '#6B7280',
     fontSize: 14,
@@ -88,8 +203,6 @@ export const layoutStyles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-
-  // ========== FORM CARD SECTION ==========
   formCard: {
     marginHorizontal: 16,
     marginBottom: 24,
@@ -102,7 +215,6 @@ export const layoutStyles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-
   cardHeader: {
     marginBottom: 24,
     borderLeftWidth: 4,
@@ -110,25 +222,20 @@ export const layoutStyles = StyleSheet.create({
     paddingLeft: 16,
     paddingBottom: 16,
   },
-
   cardTitle: {
     color: '#0F0F0F',
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 4,
   },
-
   cardSubtitle: {
     color: '#9CA3AF',
     fontSize: 12,
     fontWeight: '400',
   },
-
-  // ========== DETAILS SECTION ==========
   detailsSection: {
     marginBottom: 24,
   },
-
   sectionTitle: {
     color: '#0F0F0F',
     fontSize: 14,
@@ -137,24 +244,18 @@ export const layoutStyles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
-
-  // ========== ROW CONTAINER (FOR SIDE-BY-SIDE INPUTS) ==========
   rowContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 12,
   },
-
   rowItem: {
     flex: 1,
   },
-
-  // ========== BUTTON GROUP ==========
   buttonGroup: {
     gap: 12,
     marginTop: 24,
   },
-
   saveButton: {
     flexDirection: 'row',
     backgroundColor: '#D4AF37',
@@ -170,7 +271,6 @@ export const layoutStyles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
   },
-
   saveButtonText: {
     color: '#0F0F0F',
     fontSize: 15,
@@ -179,7 +279,6 @@ export const layoutStyles = StyleSheet.create({
     letterSpacing: 0.8,
     marginLeft: 8,
   },
-
   skipButton: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
@@ -190,7 +289,6 @@ export const layoutStyles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#D4AF37',
   },
-
   skipButtonText: {
     color: '#D4AF37',
     fontSize: 15,
@@ -201,13 +299,10 @@ export const layoutStyles = StyleSheet.create({
   },
 });
 
-// ========== FORM STYLES ==========
 export const formStyles = StyleSheet.create({
-  // Input wrapper
   inputWrapper: {
     marginBottom: 18,
   },
-
   label: {
     color: '#0F0F0F',
     fontSize: 13,
@@ -215,7 +310,6 @@ export const formStyles = StyleSheet.create({
     marginBottom: 8,
     letterSpacing: 0.3,
   },
-
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -226,13 +320,10 @@ export const formStyles = StyleSheet.create({
     backgroundColor: '#F9FAFB',
     height: 50,
   },
-
   inputIcon: {
     marginRight: 10,
     color: '#D4AF37',
   },
-
-  // Input field
   input: {
     flex: 1,
     fontSize: 14,
@@ -240,8 +331,6 @@ export const formStyles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 0,
   },
-
-  // Address input specific styles
   addressInputContainer: {
     height: 120,
     borderRadius: 10,
@@ -250,7 +339,6 @@ export const formStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
-
   addressInput: {
     flex: 1,
     fontSize: 14,
@@ -260,35 +348,96 @@ export const formStyles = StyleSheet.create({
     minHeight: 100,
     textAlignVertical: 'top',
   },
-
   addressIcon: {
     marginRight: 12,
     marginTop: 8,
   },
-
   inputFocused: {
     borderColor: '#D4AF37',
     borderWidth: 2,
   },
-
   inputFieldError: {
     borderColor: '#FF0000',
   },
-
-  // Error message
   errorMessage: {
     color: '#FF0000',
     fontSize: 12,
     fontWeight: '500',
     marginTop: 4,
   },
-
-  // Helper text
   helperText: {
     color: '#9CA3AF',
     fontSize: 12,
     fontWeight: '400',
     marginTop: 4,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '80%',
+    paddingBottom: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#0F0F0F',
+  },
+  modalItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  modalItemText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#0F0F0F',
+  },
+  fileInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+    backgroundColor: '#F9FAFB',
+    height: 60,
+  },
+  fileInputContent: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    marginLeft: 12,
+  },
+  fileInputLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#D4AF37',
+  },
+  fileInputValue: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#6B7280',
+    marginTop: 2,
   },
 });
 

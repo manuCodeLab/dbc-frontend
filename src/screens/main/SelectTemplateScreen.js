@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, ScrollView, StatusBar } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import colorsDefault from "../../styles/colors";
 import styles from "../../styles/screens/selectTemplateStyles";
+import { layoutStyles } from "../../styles/screens/personalDetailsLayoutStyles";
 import Footer from '../../components/common/Footer';
+import { getUser } from "../../utils/storage";
 import ClassicTemplate from "../../components/templates/ClassicTemplate";
 import ModernTemplate from "../../components/templates/ModernTemplate";
 import MinimalTemplate from "../../components/templates/MinimalTemplate";
@@ -14,6 +16,27 @@ export default function SelectTemplateScreen({ route, navigation }) {
   const [selected, setSelected] = useState(null);
   const [userData, setUserData] = useState(route.params?.userData || {});
   const [cardData, setCardData] = useState(route.params?.cardData || {});
+  const [userInitial, setUserInitial] = useState('N');
+
+  useEffect(() => {
+    let mounted = true;
+    const loadUser = async () => {
+      try {
+        const user = await getUser();
+        if (mounted && user) {
+          const name = user.first || user.fullName || user.firstName || '';
+          const initial = name && name.trim().length ? name.trim().charAt(0).toUpperCase() : 'N';
+          setUserInitial(initial);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    loadUser();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Load user data from storage if not provided in route
   React.useEffect(() => {
@@ -64,17 +87,40 @@ export default function SelectTemplateScreen({ route, navigation }) {
     { id: 'dark', name: 'Dark', component: DarkTemplate },
   ];
 
+  const navigateToProfile = () => {
+    navigation.navigate('Profile');
+  };
+
+  const handleBack = () => {
+    navigation.goBack();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
       
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={28} color={colorsDefault.accent} />
+      {/* ========== HEADER SECTION ========== */}
+      <View style={layoutStyles.headerSection}>
+        {/* Back Button */}
+        <TouchableOpacity 
+          onPress={handleBack}
+          style={{ width: 24, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Ionicons name="chevron-back" size={28} color="#D4AF37" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Select Template</Text>
-        <View style={{ width: 28 }} />
+
+        {/* App Title */}
+        <Text style={layoutStyles.appTitle}>
+          DIGITAL BUSINESS CARD
+        </Text>
+
+        {/* Profile Icon */}
+        <TouchableOpacity 
+          style={layoutStyles.profileIcon}
+          onPress={navigateToProfile}
+        >
+          <Text style={layoutStyles.profileIconText}>{userInitial}</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 30 }}>
@@ -129,7 +175,7 @@ export default function SelectTemplateScreen({ route, navigation }) {
       <View style={styles.bottomSection}>
         <TouchableOpacity 
           style={[styles.continueButton, (!selected || templates.length === 0) && styles.continueButtonDisabled]} 
-          onPress={() => selected && navigation.navigate('FinalPreview', { selectedTemplate: selected, userData: defaultUserData })}
+          onPress={() => selected && navigation.navigate('FinalPreview', { selectedTemplate: selected, userData: userData })}
           disabled={!selected || templates.length === 0}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>

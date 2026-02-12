@@ -1,442 +1,437 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  TextInput,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  TextInput,
   TouchableOpacity,
-  StatusBar,
   Alert,
+  StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as DocumentPicker from 'expo-document-picker';
 import { Ionicons } from '@expo/vector-icons';
-
-import { layoutStyles } from '../../styles/screens/businessDetailsStyles';
-import { formStyles } from '../../styles/screens/businessDetailsStyles';
-import { getCardDraft, saveCardDraft } from '../../utils/storage';
+import PrimaryButton from '../../components/buttons/PrimaryButton';
 import Footer from '../../components/common/Footer';
+import { businessDetailsStyles } from '../../styles/screens/businessDetailsStyles';
+import { layoutStyles } from '../../styles/screens/personalDetailsLayoutStyles';
+import { getUser } from '../../utils/storage';
 
-// Validation rules for Business Details
-const validations = {
-  companyName: {
-    minLength: 2,
-    required: true,
-    message: 'Company name must be at least 2 characters',
-  },
-  industry: {
-    required: true,
-    message: 'Industry/Category is required',
-  },
-  website: {
-    urlFormat: true,
-    required: false,
-    message: 'Enter valid website URL (e.g., https://example.com)',
-  },
-  address: {
-    minLength: 5,
-    required: true,
-    message: 'Address must be at least 5 characters',
-  },
-  city: {
-    lettersOnly: true,
-    required: true,
-    message: 'City must contain letters only',
-  },
-  zipCode: {
-    exactLength: 6,
-    numbersOnly: true,
-    required: true,
-    message: 'Pincode must be exactly 6 digits',
-  },
-};
+export default function BusinessDetailsScreen({ route, navigation }) {
+  const personData = route.params?.personData || {};
+  const [userInitial, setUserInitial] = useState('N');
 
-export default function BusinessDetailsScreen({ navigation }) {
-  const [formData, setFormData] = useState({
+  useEffect(() => {
+    let mounted = true;
+    const loadUser = async () => {
+      try {
+        const user = await getUser();
+        if (mounted && user) {
+          const name = user.first || user.fullName || user.firstName || '';
+          const initial = name && name.trim().length ? name.trim().charAt(0).toUpperCase() : 'N';
+          setUserInitial(initial);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    loadUser();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const [form, setForm] = useState({
+    searchKeywords: '',
     companyName: '',
-    industry: '',
-    website: '',
-    companyPhone: '',
-    companyEmail: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: '',
-    description: '',
+    businessCategory: '',
+    businessSubCategory: '',
+    clients: '',
+    businessDescription: '',
   });
 
+  const [pdfFile, setPdfFile] = useState(null);
   const [errors, setErrors] = useState({});
 
-  // Validate single field
-  const validateField = (name, value) => {
-    const rule = validations[name];
-    if (!rule) return '';
-
-    if (rule.required && !value.trim()) {
-      return `${name.replace(/([A-Z])/g, ' $1').trim()} is required`;
+  const updateForm = (field, value) => {
+    setForm({ ...form, [field]: value });
+    if (errors[field]) {
+      setErrors({ ...errors, [field]: '' });
     }
-
-    if (!rule.required && !value.trim()) {
-      return '';
-    }
-
-    if (name === 'companyName') {
-      if (value.trim().length < rule.minLength) {
-        return `Company name must be at least ${rule.minLength} characters`;
-      }
-    }
-
-    if (name === 'address') {
-      if (value.trim().length < rule.minLength) {
-        return `Address must be at least ${rule.minLength} characters`;
-      }
-    }
-
-    if (name === 'city') {
-      if (!/^[a-zA-Z\s]{2,}$/.test(value.trim())) {
-        return 'City must contain letters only';
-      }
-    }
-
-    if (name === 'zipCode') {
-      const digits = value.replace(/\D/g, '');
-      if (value && digits.length !== rule.exactLength) {
-        return `Pincode must be exactly ${rule.exactLength} digits`;
-      }
-      if (value && !/^[0-9]*$/.test(digits)) {
-        return 'Pincode must contain numbers only';
-      }
-    }
-
-    if (name === 'website' && value) {
-      if (!/^https?:\/\/.+\..+/.test(value)) {
-        return 'Enter valid website URL (must start with http:// or https://)';
-      }
-    }
-
-    return '';
   };
 
-  // Handle field change
-  const handleFieldChange = (name, value) => {
-    let cleanedValue = value;
-
-    // Clean based on field type
-    if (name === 'companyName') {
-      cleanedValue = value.slice(0, 50);
-    } else if (name === 'city') {
-      cleanedValue = value.replace(/[^a-zA-Z\s]/g, '').slice(0, 30);
-    } else if (name === 'zipCode') {
-      cleanedValue = value.replace(/\D/g, '').slice(0, 6);
-    }
-
-    setFormData({ ...formData, [name]: cleanedValue });
-
-    // Real-time validation
-    const error = validateField(name, cleanedValue);
-    setErrors({ ...errors, [name]: error });
-  };
-
-  // Validate all fields before saving
-  const validateAllFields = () => {
+  const validateForm = () => {
     const newErrors = {};
-    let isValid = true;
 
-    Object.keys(validations).forEach((field) => {
-      const error = validateField(field, formData[field]);
-      if (error) {
-        newErrors[field] = error;
-        isValid = false;
-      }
-    });
+    if (!form.searchKeywords.trim()) {
+      newErrors.searchKeywords = 'Search keywords are required';
+    }
+    if (!form.companyName.trim()) {
+      newErrors.companyName = 'Company name is required';
+    }
+    if (!form.businessDescription.trim()) {
+      newErrors.businessDescription = 'Business description is required';
+    }
 
     setErrors(newErrors);
-    return isValid;
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = () => {
-    if (validateAllFields()) {
-      console.log('Business Data:', formData);
-      // merge with any existing draft and save, then navigate forward
-      (async () => {
-        try {
-          const existing = await getCardDraft();
-          const merged = { ...existing, ...formData };
-          await saveCardDraft(merged);
-        } catch (e) {
-          console.warn('save draft failed', e);
-        }
-        navigation.navigate('SocialMedia');
-      })();
-    } else {
-      Alert.alert('Validation Error', 'Please fix all errors before proceeding');
+  const handlePdfPicker = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: 'application/pdf',
+      });
+
+      if (!result.canceled) {
+        setPdfFile({
+          name: result.assets[0].name,
+          uri: result.assets[0].uri,
+          size: result.assets[0].size,
+        });
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Failed to pick PDF file');
     }
   };
 
-  const navigateToDashboard = () => {
+  const handleNext = () => {
+    if (!validateForm()) {
+      Alert.alert('Validation Error', 'Please fill all required fields');
+      return;
+    }
+
+    const businessData = {
+      searchKeywords: form.searchKeywords,
+      companyName: form.companyName,
+      businessCategory: form.businessCategory,
+      businessSubCategory: form.businessSubCategory,
+      clients: form.clients,
+      businessDescription: form.businessDescription,
+      pdfFile: pdfFile,
+    };
+
+    const cardData = {
+      ...personData,
+      ...businessData,
+    };
+
+    navigation.navigate('SocialMedia', { cardData });
+  };
+
+  const navigateToProfile = () => {
+    navigation.navigate('Profile');
+  };
+
+  const navigateToLanding = () => {
+    navigation.navigate('Landing');
+  };
+
+  const handleBack = () => {
     navigation.goBack();
   };
 
   return (
-    <SafeAreaView style={layoutStyles.container}>
+    <SafeAreaView style={businessDetailsStyles.safe}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 30 }}
+      <KeyboardAvoidingView
+        style={businessDetailsStyles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-      
-      {/* ========== HEADER SECTION ========== */}
-      <View style={layoutStyles.headerSection}>
-        {/* Back Button */}
-        <TouchableOpacity 
-          style={layoutStyles.backButton}
-          onPress={navigateToDashboard}
+        <ScrollView
+          contentContainerStyle={businessDetailsStyles.scrollContent}
+          showsVerticalScrollIndicator={false}
         >
-          <Ionicons name="chevron-back" size={28} color="#D4AF37" />
-        </TouchableOpacity>
+          {/* ========== HEADER SECTION ========== */}
+          <View style={layoutStyles.headerSection}>
+            {/* Back Button */}
+            <TouchableOpacity
+              onPress={handleBack}
+              style={{ width: 24, justifyContent: 'center', alignItems: 'center' }}
+            >
+              <Ionicons name="chevron-back" size={28} color="#D4AF37" />
+            </TouchableOpacity>
 
-        {/* App Title */}
-        <Text style={layoutStyles.appTitle}>
-          BUSINESS DETAILS
-        </Text>
+            {/* App Title */}
+            <Text style={layoutStyles.appTitle}>
+              DIGITAL BUSINESS CARD
+            </Text>
 
-        {/* Step Indicator */}
-        <View style={layoutStyles.stepIndicator}>
-          <Text style={layoutStyles.stepText}>2</Text>
-        </View>
-      </View>
-
-      {/* ========== TITLE SECTION ========== */}
-      <View style={layoutStyles.titleSection}>
-        <Text style={layoutStyles.mainTitle}>
-          Business Information
-        </Text>
-        <Text style={layoutStyles.subtitle}>
-          Add your company details to your digital business card
-        </Text>
-      </View>
-
-      {/* ========== FORM CARD SECTION ========== */}
-      <View style={layoutStyles.formCard}>
-        
-        {/* Card Header */}
-        <View style={layoutStyles.cardHeader}>
-          <Text style={layoutStyles.cardTitle}>Step 2 of 3</Text>
-          <Text style={layoutStyles.cardSubtitle}>
-            All fields marked with * are mandatory
-          </Text>
-        </View>
-
-        {/* Section 1: Basic Information */}
-        <View style={layoutStyles.detailsSection}>
-          <Text style={layoutStyles.sectionTitle}>Basic Information</Text>
-
-          <InputField 
-            label="Company Name *" 
-            placeholder="Enter company name"
-            icon="business"
-            value={formData.companyName}
-            onChangeText={(text) => handleFieldChange('companyName', text)}
-            error={errors.companyName}
-            maxLength={50}
-          />
-
-          <InputField 
-            label="Industry/Category *" 
-            placeholder="e.g., Technology, Finance"
-            icon="briefcase"
-            value={formData.industry}
-            onChangeText={(text) => setFormData({...formData, industry: text})}
-            error={errors.industry}
-          />
-
-          <InputField 
-            label="Website (Optional)" 
-            placeholder="https://example.com"
-            icon="globe"
-            value={formData.website}
-            onChangeText={(text) => handleFieldChange('website', text)}
-            error={errors.website}
-          />
-
-          <InputField 
-            label="Company Phone *" 
-            placeholder="Company phone number"
-            icon="call"
-            keyboardType="phone-pad"
-            value={formData.companyPhone}
-            onChangeText={(text) => setFormData({...formData, companyPhone: text})}
-          />
-
-          <InputField 
-            label="Company Email *" 
-            placeholder="company@example.com"
-            icon="mail"
-            keyboardType="email-address"
-            value={formData.companyEmail}
-            onChangeText={(text) => setFormData({...formData, companyEmail: text})}
-          />
-        </View>
-
-        {/* Section 2: Address Information */}
-        <View style={layoutStyles.detailsSection}>
-          <Text style={layoutStyles.sectionTitle}>Address Information</Text>
-
-          <InputField 
-            label="Address * (min 5 chars)" 
-            placeholder="Street address"
-            icon="location"
-            multiline
-            value={formData.address}
-            onChangeText={(text) => handleFieldChange('address', text)}
-            error={errors.address}
-          />
-
-          <View style={layoutStyles.rowContainer}>
-            <View style={layoutStyles.rowItem}>
-              <InputField 
-                label="City * (letters only)" 
-                placeholder="City"
-                icon="home"
-                value={formData.city}
-                onChangeText={(text) => handleFieldChange('city', text)}
-                error={errors.city}
-              />
-            </View>
-            <View style={layoutStyles.rowItem}>
-              <InputField 
-                label="State *" 
-                placeholder="State"
-                icon="document"
-                value={formData.state}
-                onChangeText={(text) => setFormData({...formData, state: text})}
-              />
-            </View>
+            {/* Profile Icon */}
+            <TouchableOpacity
+              style={layoutStyles.profileIcon}
+              onPress={navigateToProfile}
+            >
+              <Text style={layoutStyles.profileIconText}>{userInitial}</Text>
+            </TouchableOpacity>
           </View>
 
-          <View style={layoutStyles.rowContainer}>
-            <View style={layoutStyles.rowItem}>
-              <InputField 
-                label="Pincode * (6 digits)" 
-                placeholder="Zip code"
-                icon="pin"
-                keyboardType="numeric"
-                value={formData.zipCode}
-                onChangeText={(text) => handleFieldChange('zipCode', text)}
-                error={errors.zipCode}
-                maxLength={6}
-              />
+          {/* ========== TITLE SECTION ========== */}
+          <View style={layoutStyles.titleSection}>
+            <Text style={layoutStyles.mainTitle}>
+              Digital Business Card Creator
+            </Text>
+            <Text style={layoutStyles.subtitle}>
+              Create your professional digital business card in minutes
+            </Text>
+          </View>
+
+          {/* ========== FORM CARD SECTION ========== */}
+          <View style={layoutStyles.formCard}>
+
+            {/* Business Details Header */}
+            <View style={layoutStyles.cardHeader}>
+              <Text style={layoutStyles.cardTitle}>Step 2 of 3</Text>
+              <Text style={layoutStyles.cardSubtitle}>
+                All fields marked with * are mandatory
+              </Text>
             </View>
-            <View style={layoutStyles.rowItem}>
-              <InputField 
-                label="Country *" 
-                placeholder="Country"
-                icon="earth"
-                value={formData.country}
-                onChangeText={(text) => setFormData({...formData, country: text})}
-              />
+
+            {/* Business Details Section */}
+            <View style={layoutStyles.detailsSection}>
+              {/* SEARCH KEYWORDS */}
+              <View style={businessDetailsStyles.fieldWrapper}>
+                <View style={businessDetailsStyles.labelRow}>
+                  <View style={businessDetailsStyles.labelLeft}>
+                    <Ionicons
+                      name="search"
+                      size={17}
+                      color="#D4AF37"
+                    />
+                    <Text style={businessDetailsStyles.label}>
+                      {'  '}Search Keywords
+                      <Text style={businessDetailsStyles.star}> *</Text>
+                    </Text>
+                  </View>
+                  {errors.searchKeywords && (
+                    <Text style={businessDetailsStyles.errorText}>
+                      {errors.searchKeywords}
+                    </Text>
+                  )}
+                </View>
+                <TextInput
+                  style={[
+                    businessDetailsStyles.input,
+                    errors.searchKeywords && businessDetailsStyles.inputError,
+                  ]}
+                  placeholder="e.g., Web Design, Digital Marketing"
+                  placeholderTextColor="#9CA3AF"
+                  value={form.searchKeywords}
+                  onChangeText={(value) =>
+                    updateForm('searchKeywords', value)
+                  }
+                />
+              </View>
+
+              {/* COMPANY NAME */}
+              <View style={businessDetailsStyles.fieldWrapper}>
+                <View style={businessDetailsStyles.labelRow}>
+                  <View style={businessDetailsStyles.labelLeft}>
+                    <Ionicons
+                      name="briefcase"
+                      size={17}
+                      color="#D4AF37"
+                    />
+                    <Text style={businessDetailsStyles.label}>
+                      {'  '}Company Name
+                      <Text style={businessDetailsStyles.star}> *</Text>
+                    </Text>
+                  </View>
+                  {errors.companyName && (
+                    <Text style={businessDetailsStyles.errorText}>
+                      {errors.companyName}
+                    </Text>
+                  )}
+                </View>
+                <TextInput
+                  style={[
+                    businessDetailsStyles.input,
+                    errors.companyName && businessDetailsStyles.inputError,
+                  ]}
+                  placeholder="Enter your company name"
+                  placeholderTextColor="#9CA3AF"
+                  value={form.companyName}
+                  onChangeText={(value) => updateForm('companyName', value)}
+                />
+              </View>
+
+              {/* BUSINESS CATEGORY */}
+              <View style={businessDetailsStyles.fieldWrapper}>
+                <View style={businessDetailsStyles.labelRow}>
+                  <View style={businessDetailsStyles.labelLeft}>
+                    <Ionicons
+                      name="pricetag"
+                      size={17}
+                      color="#D4AF37"
+                    />
+                    <Text style={businessDetailsStyles.label}>
+                      {'  '}Business Category
+                    </Text>
+                  </View>
+                </View>
+                <TextInput
+                  style={businessDetailsStyles.input}
+                  placeholder="e.g., Technology, Finance"
+                  placeholderTextColor="#9CA3AF"
+                  value={form.businessCategory}
+                  onChangeText={(value) =>
+                    updateForm('businessCategory', value)
+                  }
+                />
+              </View>
+
+              {/* BUSINESS SUB-CATEGORY */}
+              <View style={businessDetailsStyles.fieldWrapper}>
+                <View style={businessDetailsStyles.labelRow}>
+                  <View style={businessDetailsStyles.labelLeft}>
+                    <Ionicons
+                      name="layers"
+                      size={17}
+                      color="#D4AF37"
+                    />
+                    <Text style={businessDetailsStyles.label}>
+                      {'  '}Business Sub-Category
+                    </Text>
+                  </View>
+                </View>
+                <TextInput
+                  style={businessDetailsStyles.input}
+                  placeholder="e.g., Web Development, Consulting"
+                  placeholderTextColor="#9CA3AF"
+                  value={form.businessSubCategory}
+                  onChangeText={(value) =>
+                    updateForm('businessSubCategory', value)
+                  }
+                />
+              </View>
+
+              {/* CLIENTS */}
+              <View style={businessDetailsStyles.fieldWrapper}>
+                <View style={businessDetailsStyles.labelRow}>
+                  <View style={businessDetailsStyles.labelLeft}>
+                    <Ionicons
+                      name="people"
+                      size={17}
+                      color="#D4AF37"
+                    />
+                    <Text style={businessDetailsStyles.label}>
+                      {'  '}Clients
+                    </Text>
+                  </View>
+                </View>
+                <TextInput
+                  style={businessDetailsStyles.input}
+                  placeholder="List your main clients (optional)"
+                  placeholderTextColor="#9CA3AF"
+                  value={form.clients}
+                  onChangeText={(value) => updateForm('clients', value)}
+                />
+              </View>
+
+              {/* BUSINESS DESCRIPTION */}
+              <View style={businessDetailsStyles.fieldWrapper}>
+                <View style={businessDetailsStyles.labelRow}>
+                  <View style={businessDetailsStyles.labelLeft}>
+                    <Ionicons
+                      name="document-text"
+                      size={17}
+                      color="#D4AF37"
+                    />
+                    <Text style={businessDetailsStyles.label}>
+                      {'  '}Business Description
+                      <Text style={businessDetailsStyles.star}> *</Text>
+                    </Text>
+                  </View>
+                  {errors.businessDescription && (
+                    <Text style={businessDetailsStyles.errorText}>
+                      {errors.businessDescription}
+                    </Text>
+                  )}
+                </View>
+                <TextInput
+                  style={[
+                    businessDetailsStyles.input,
+                    businessDetailsStyles.multilineInput,
+                    errors.businessDescription &&
+                    businessDetailsStyles.inputError,
+                  ]}
+                  placeholder="Describe your business, services, and expertise"
+                  placeholderTextColor="#9CA3AF"
+                  value={form.businessDescription}
+                  onChangeText={(value) =>
+                    updateForm('businessDescription', value)
+                  }
+                  multiline
+                  numberOfLines={5}
+                  textAlignVertical="top"
+                />
+              </View>
+
+              {/* PDF UPLOAD */}
+              <View style={businessDetailsStyles.fieldWrapper}>
+                <View style={businessDetailsStyles.labelRow}>
+                  <View style={businessDetailsStyles.labelLeft}>
+                    <Ionicons
+                      name="document"
+                      size={17}
+                      color="#D4AF37"
+                    />
+                    <Text style={businessDetailsStyles.label}>
+                      {'  '}Business Description PDF
+                    </Text>
+                  </View>
+                </View>
+                <TouchableOpacity
+                  style={businessDetailsStyles.pdfButton}
+                  onPress={handlePdfPicker}
+                >
+                  <Ionicons
+                    name="cloud-upload"
+                    size={20}
+                    color="#D4AF37"
+                  />
+                  <Text style={businessDetailsStyles.pdfButtonText}>
+                    Choose PDF File
+                  </Text>
+                </TouchableOpacity>
+                {pdfFile && (
+                  <View style={businessDetailsStyles.pdfFileInfo}>
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={16}
+                      color="#22c55e"
+                    />
+                    <Text style={businessDetailsStyles.pdfFileName}>
+                      {pdfFile.name}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            {/* BUTTON GROUP */}
+            <View style={layoutStyles.buttonGroup}>
+              <TouchableOpacity
+                style={layoutStyles.saveButton}
+                onPress={handleNext}
+              >
+                <Ionicons name="checkmark-done" size={18} color="#0F0F0F" />
+                <Text style={layoutStyles.saveButtonText}>Step 3: Social Media</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={layoutStyles.skipButton}
+                onPress={handleBack}
+              >
+                <Ionicons name="arrow-back" size={18} color="#D4AF37" />
+                <Text style={layoutStyles.skipButtonText}>Go Back</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </View>
-
-        {/* Section 3: Company Description */}
-        <View style={layoutStyles.detailsSection}>
-          <Text style={layoutStyles.sectionTitle}>Company Description</Text>
-
-          <InputField 
-            label="Description" 
-            placeholder="Tell us about your company..."
-            icon="document-text"
-            multiline
-            value={formData.description}
-            onChangeText={(text) => setFormData({...formData, description: text})}
-          />
-        </View>
-
-        {/* Action Buttons */}
-        <View style={layoutStyles.buttonGroup}>
-          <TouchableOpacity 
-            style={layoutStyles.saveButton}
-            onPress={handleSave}
-          >
-            <Ionicons name="checkmark-done" size={18} color="#0F0F0F" />
-            <Text style={layoutStyles.saveButtonText}>Step 3: Social Media</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={layoutStyles.skipButton}
-            onPress={navigateToDashboard}
-          >
-            <Ionicons name="arrow-back" size={18} color="#D4AF37" />
-            <Text style={layoutStyles.skipButtonText}>Go Back</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={{ height: 30 }} />
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
       <Footer activeTab="" navigation={navigation} fromScreen="BusinessDetails" />
     </SafeAreaView>
-  );
-}
-
-function InputField({ label, placeholder, icon, multiline, keyboardType, value, onChangeText, maxLength, error }) {
-  const renderLabel = () => {
-    if (!label) return null;
-    
-    const parts = label.split('*');
-    
-    if (parts.length === 1) {
-      return <Text style={formStyles.label}>{label}</Text>;
-    }
-    
-    return (
-      <Text style={formStyles.label}>
-        {parts[0]}
-        <Text style={{ color: '#EF4444', fontWeight: '700' }}>*</Text>
-        {parts[1]}
-      </Text>
-    );
-  };
-
-  return (
-    <View style={formStyles.inputWrapper}>
-      {renderLabel()}
-      <View style={[
-        formStyles.inputContainer,
-        multiline && formStyles.addressInputContainer,
-        error && { borderColor: '#EF4444', borderWidth: 2 }
-      ]}>
-        <Ionicons 
-          name={icon} 
-          size={20} 
-          color={error ? '#EF4444' : '#D4AF37'} 
-          style={[formStyles.inputIcon, multiline && formStyles.addressIcon]} 
-        />
-        <TextInput
-          style={[
-            formStyles.input,
-            multiline && formStyles.addressInput,
-            error && { color: '#EF4444' }
-          ]}
-          placeholder={placeholder}
-          placeholderTextColor={error ? '#FCA5A5' : '#A0AEC0'}
-          multiline={multiline}
-          numberOfLines={multiline ? 4 : 1}
-          keyboardType={keyboardType}
-          maxLength={maxLength}
-          value={value}
-          onChangeText={onChangeText}
-        />
-      </View>
-      {error && (
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
-          <Ionicons name="alert-circle" size={14} color="#EF4444" />
-          <Text style={{ color: '#EF4444', fontSize: 12, marginLeft: 4, fontWeight: '500' }}>
-            {error}
-          </Text>
-        </View>
-      )}
-    </View>
   );
 }
