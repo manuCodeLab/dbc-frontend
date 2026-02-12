@@ -12,8 +12,7 @@ import PersonalDetailsScreen from '../screens/main/PersonalDetailsScreen';
 import BusinessDetailsScreen from '../screens/main/BusinessDetailsScreen';
 import SocialMediaScreen from '../screens/main/SocialMediaScreen';
 import SelectTemplateScreen from '../screens/main/SelectTemplateScreen';
-import CreateCardPersonal from '../screens/main/CreateCardPersonal';
-import TemplatePreviewScreen from '../screens/main/TemplatePreviewScreen';
+import FinalPreviewScreen from '../screens/main/FinalPreviewScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
 import ContactsScreen from '../screens/main/ContactsScreen';
 // onboarding screens removed
@@ -98,8 +97,7 @@ export default function AppNavigator() {
       <Stack.Screen name="BusinessDetails" component={BusinessDetailsScreen} />
       <Stack.Screen name="SocialMedia" component={SocialMediaScreen} />
       <Stack.Screen name="SelectTemplate" component={SelectTemplateScreen} />
-      <Stack.Screen name="TemplatePreview" component={TemplatePreviewScreen} />
-      <Stack.Screen name="CreateCardPersonal" component={CreateCardPersonal} />
+      <Stack.Screen name="FinalPreview" component={FinalPreviewScreen} />
       <Stack.Screen name="Contacts" component={ContactsScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Dashboard" component={DashboardTabs} />

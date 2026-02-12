@@ -5,15 +5,32 @@ import { Ionicons } from '@expo/vector-icons';
 import colorsDefault from "../../styles/colors";
 import styles from "../../styles/screens/selectTemplateStyles";
 import Footer from '../../components/common/Footer';
-
-import Template1 from "../../components/templates/Template1";
-import Template2 from "../../components/templates/Template2";
-import Template3 from "../../components/templates/Template3";
-import Template4 from "../../components/templates/Template4";
+import ClassicTemplate from "../../components/templates/ClassicTemplate";
+import ModernTemplate from "../../components/templates/ModernTemplate";
+import MinimalTemplate from "../../components/templates/MinimalTemplate";
+import DarkTemplate from "../../components/templates/DarkTemplate";
 
 export default function SelectTemplateScreen({ route, navigation }) {
   const [selected, setSelected] = useState(null);
+  const [userData, setUserData] = useState(route.params?.userData || {});
   const [cardData, setCardData] = useState(route.params?.cardData || {});
+
+  // Load user data from storage if not provided in route
+  React.useEffect(() => {
+    if (!route.params?.userData || Object.keys(route.params?.userData).length === 0) {
+      (async () => {
+        try {
+          const { getUser } = await import('../../utils/storage');
+          const user = await getUser();
+          if (user) {
+            setUserData(user);
+          }
+        } catch (e) {
+          console.log('Error loading user:', e);
+        }
+      })();
+    }
+  }, [route.params]);
 
   // If route didn't pass cardData, try loading draft from storage
   React.useEffect(() => {
@@ -30,11 +47,21 @@ export default function SelectTemplateScreen({ route, navigation }) {
     }
   }, [route.params]);
 
+  // Sample user data for display - use real data or fallback
+  const defaultUserData = {
+    name: userData?.name || userData?.fullName || 'Your Name',
+    title: userData?.title || userData?.designation || 'Your Title',
+    email: userData?.email || 'your.email@example.com',
+    phone: userData?.phone || '+1 (555) 000-0000',
+    company: userData?.company || userData?.organization || 'Your Company',
+    website: userData?.website || 'www.yourwebsite.com',
+  };
+
   const templates = [
-    { id: 1, name: 'Glass', component: Template1 },
-    { id: 2, name: 'Minimal', component: Template2 },
-    { id: 3, name: 'Modern', component: Template3 },
-    { id: 4, name: 'Bold', component: Template4 },
+    { id: 'classic', name: 'Classic', component: ClassicTemplate },
+    { id: 'modern', name: 'Modern', component: ModernTemplate },
+    { id: 'minimal', name: 'Minimal', component: MinimalTemplate },
+    { id: 'dark', name: 'Dark', component: DarkTemplate },
   ];
 
   return (
@@ -59,33 +86,41 @@ export default function SelectTemplateScreen({ route, navigation }) {
 
         {/* Template Cards - One by One */}
         <View style={styles.templatesContainer}>
-          {templates.map((template) => (
-            <TouchableOpacity
-              key={template.id}
-              style={[styles.templateCard, selected === template.id && styles.templateCardSelected]}
-              onPress={() => setSelected(template.id)}
-            >
-              {/* Card Preview */}
-              <View style={styles.cardPreviewWrapper}>
-                {(() => {
-                  const Comp = template.component;
-                  return <Comp cardData={cardData} thumbnail={true} />;
-                })()}
-              </View>
+          {templates.length === 0 ? (
+            <View style={{ alignItems: 'center', paddingVertical: 40 }}>
+              <Text style={{ fontSize: 16, color: '#999', textAlign: 'center' }}>
+                No templates available
+              </Text>
+            </View>
+          ) : (
+            templates.map((template) => (
+              <TouchableOpacity
+                key={template.id}
+                style={[styles.templateCard, selected === template.id && styles.templateCardSelected]}
+                onPress={() => setSelected(template.id)}
+              >
+                {/* Card Preview */}
+                <View style={styles.cardPreviewWrapper}>
+                  {(() => {
+                    const Comp = template.component;
+                    return <Comp userData={defaultUserData} isSelected={selected === template.id} />;
+                  })()}
+                </View>
 
-              {/* Template Name */}
-              <View style={styles.templateInfo}>
-                <Text style={styles.templateName}>{template.name}</Text>
-              </View>
+                {/* Template Name */}
+                <View style={styles.templateInfo}>
+                  <Text style={styles.templateName}>{template.name}</Text>
+                </View>
 
-              {/* Selection Radio Button */}
-              <View style={[styles.radioButton, selected === template.id && styles.radioButtonSelected]}>
-                {selected === template.id && (
-                  <Ionicons name="checkmark" size={16} color="#fff" />
-                )}
-              </View>
-            </TouchableOpacity>
-          ))}
+                {/* Selection Radio Button */}
+                <View style={[styles.radioButton, selected === template.id && styles.radioButtonSelected]}>
+                  {selected === template.id && (
+                    <Ionicons name="checkmark" size={16} color="#fff" />
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
 
       </ScrollView>
@@ -93,9 +128,9 @@ export default function SelectTemplateScreen({ route, navigation }) {
       {/* Bottom Action Buttons */}
       <View style={styles.bottomSection}>
         <TouchableOpacity 
-          style={[styles.continueButton, !selected && styles.continueButtonDisabled]} 
-          onPress={() => selected && navigation.navigate('TemplatePreview', { templateId: selected, cardData })}
-          disabled={!selected}
+          style={[styles.continueButton, (!selected || templates.length === 0) && styles.continueButtonDisabled]} 
+          onPress={() => selected && navigation.navigate('FinalPreview', { selectedTemplate: selected, userData: defaultUserData })}
+          disabled={!selected || templates.length === 0}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
             <Text style={styles.continueButtonText}>View Preview</Text>
