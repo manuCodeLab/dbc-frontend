@@ -13,13 +13,16 @@ const DarkTemplate = ({ data, userData, isSelected }) => {
     phone = '+1 (555) 123-4567',
     email = 'email@example.com',
     website = 'www.example.com',
+    description = '',
+    businessDescription = '',
+    searchKeywords = '',
     linkedin = '',
     instagram = '',
     twitter = '',
   } = cardData;
 
-  // If this is being used for template selection (isSelected prop exists)
-  if (isSelected !== undefined) {
+  // If this is being used for template selection (isSelected prop is true)
+  if (isSelected === true) {
     return (
       <View style={[styles.selectionContainer, isSelected && styles.selected]}>
         <View style={styles.selectionHeader}>

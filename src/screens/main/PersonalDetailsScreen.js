@@ -68,10 +68,9 @@ const validate = {
 
 export default function PersonalDetailsScreen({ navigation }) {
   const [formData, setFormData] = useState({
-    fullName: '',
+    name: '',
     designation: '',
-    phone1: '',
-    phone2: '',
+    phone: '',
     email: '',
     address: '',
   });
@@ -150,19 +149,14 @@ export default function PersonalDetailsScreen({ navigation }) {
   // Handle field change
   const handleFieldChange = (name, value) => {
     let cleanedValue = value;
-
-    // Clean based on field type
-    if (name === 'fullName') {
+    if (name === 'name') {
       cleanedValue = value.replace(/[^a-zA-Z\s]/g, '').slice(0, 50);
-    } else if (name === 'phone1' || name === 'phone2') {
+    } else if (name === 'phone') {
       cleanedValue = value.replace(/\D/g, '').slice(0, 10);
     } else if (name === 'designation') {
       cleanedValue = value.slice(0, 40);
     }
-
     setFormData({ ...formData, [name]: cleanedValue });
-
-    // Real-time validation
     const error = validateField(name, cleanedValue);
     setErrors({ ...errors, [name]: error });
   };
@@ -198,7 +192,14 @@ export default function PersonalDetailsScreen({ navigation }) {
   };
 
   const navigateToBusinessDetails = () => {
-    navigation.navigate('BusinessDetails');
+    const personalData = {
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      designation: formData.designation,
+      address: formData.address,
+    };
+    navigation.navigate('BusinessDetails', { personalData });
   };
 
   const navigateToLanding = () => {
@@ -262,14 +263,14 @@ export default function PersonalDetailsScreen({ navigation }) {
         <View style={layoutStyles.detailsSection}>
           <Text style={layoutStyles.sectionTitle}>Personal Details</Text>
 
-          {/* Full Name */}
+          {/* Name */}
           <InputField 
-            label="Full Name *" 
-            placeholder="Enter full name"
+            label="Name *" 
+            placeholder="Enter your name"
             icon="person"
-            value={formData.fullName}
-            onChangeText={(text) => handleFieldChange('fullName', text)}
-            error={errors.fullName}
+            value={formData.name}
+            onChangeText={(text) => handleFieldChange('name', text)}
+            error={errors.name}
           />
 
           {/* Designation */}
@@ -288,21 +289,9 @@ export default function PersonalDetailsScreen({ navigation }) {
             placeholder="10-digit phone number"
             icon="call"
             keyboardType="phone-pad"
-            value={formData.phone1}
-            onChangeText={(text) => handleFieldChange('phone1', text)}
-            error={errors.phone1}
-            maxLength={10}
-          />
-
-          {/* Phone Number 2 (Optional) */}
-          <InputField 
-            label="Phone Number 2 (Optional, 10 digits)" 
-            placeholder="Alternate number"
-            icon="call"
-            keyboardType="phone-pad"
-            value={formData.phone2}
-            onChangeText={(text) => handleFieldChange('phone2', text)}
-            error={errors.phone2}
+            value={formData.phone}
+            onChangeText={(text) => handleFieldChange('phone', text)}
+            error={errors.phone}
             maxLength={10}
           />
 
@@ -336,6 +325,8 @@ export default function PersonalDetailsScreen({ navigation }) {
             if (validateAllFields()) {
               await saveDashboard(formData);
               navigateToBusinessDetails();
+            } else {
+              Alert.alert('Validation Error', 'Please fix all errors before proceeding');
             }
           }}
         >

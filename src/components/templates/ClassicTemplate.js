@@ -13,13 +13,16 @@ const ClassicTemplate = ({ data, userData, isSelected }) => {
     phone = '+1 (555) 123-4567',
     email = 'email@example.com',
     website = 'www.example.com',
+    description = '',
+    businessDescription = '',
+    searchKeywords = '',
     linkedin = '',
     instagram = '',
     twitter = '',
   } = cardData;
 
-  // If this is being used for template selection (isSelected prop exists)
-  if (isSelected !== undefined) {
+  // If this is being used for template selection (isSelected prop is true)
+  if (isSelected === true) {
     return (
       <View style={[styles.selectionContainer, isSelected && styles.selected]}>
         <View style={styles.selectionHeader}>
@@ -106,6 +109,22 @@ const ClassicTemplate = ({ data, userData, isSelected }) => {
             </View>
           )}
         </View>
+
+        {/* Business Description */}
+        {(description || businessDescription) && (
+          <View style={styles.descriptionSection}>
+            <Text style={styles.descriptionLabel}>About Business</Text>
+            <Text style={styles.descriptionText}>{description || businessDescription}</Text>
+          </View>
+        )}
+
+        {/* Keywords */}
+        {searchKeywords && (
+          <View style={styles.keywordsSection}>
+            <Text style={styles.keywordsLabel}>Keywords</Text>
+            <Text style={styles.keywordsText}>{searchKeywords}</Text>
+          </View>
+        )}
 
         {/* Social Media Links */}
         {(linkedin || instagram || twitter) && (

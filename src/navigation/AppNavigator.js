@@ -11,6 +11,7 @@ import LandingScreen from '../screens/main/LandingScreen';
 import PersonalDetailsScreen from '../screens/main/PersonalDetailsScreen';
 import BusinessDetailsScreen from '../screens/main/BusinessDetailsScreen';
 import SocialMediaScreen from '../screens/main/SocialMediaScreen';
+import TemplatePreviewScreen from '../screens/main/TemplatePreviewScreen';
 import SelectTemplateScreen from '../screens/main/SelectTemplateScreen';
 import FinalPreviewScreen from '../screens/main/FinalPreviewScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
@@ -96,6 +97,7 @@ export default function AppNavigator() {
       <Stack.Screen name="PersonalDetails" component={PersonalDetailsScreen} />
       <Stack.Screen name="BusinessDetails" component={BusinessDetailsScreen} />
       <Stack.Screen name="SocialMedia" component={SocialMediaScreen} />
+      <Stack.Screen name="TemplatePreview" component={TemplatePreviewScreen} />
       <Stack.Screen name="SelectTemplate" component={SelectTemplateScreen} />
       <Stack.Screen name="FinalPreview" component={FinalPreviewScreen} />
       <Stack.Screen name="Contacts" component={ContactsScreen} />

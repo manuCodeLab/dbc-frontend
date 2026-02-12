@@ -9,9 +9,11 @@ import {
   TouchableOpacity,
   Alert,
   StatusBar,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
 import Footer from '../../components/common/Footer';
@@ -20,7 +22,7 @@ import { layoutStyles } from '../../styles/screens/personalDetailsLayoutStyles';
 import { getUser } from '../../utils/storage';
 
 export default function BusinessDetailsScreen({ route, navigation }) {
-  const personData = route.params?.personData || {};
+  const { personalData = {} } = route.params || {};
   const [userInitial, setUserInitial] = useState('N');
 
   useEffect(() => {
@@ -53,6 +55,7 @@ export default function BusinessDetailsScreen({ route, navigation }) {
   });
 
   const [pdfFile, setPdfFile] = useState(null);
+  const [logoImage, setLogoImage] = useState(null);
   const [errors, setErrors] = useState({});
 
   const updateForm = (field, value) => {
@@ -97,6 +100,29 @@ export default function BusinessDetailsScreen({ route, navigation }) {
     }
   };
 
+  const handleLogoUpload = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        setLogoImage({
+          name: result.assets[0].fileName || 'logo.jpg',
+          uri: result.assets[0].uri,
+          type: result.assets[0].type,
+          width: result.assets[0].width,
+          height: result.assets[0].height,
+        });
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Failed to pick image');
+    }
+  };
+
   const handleNext = () => {
     if (!validateForm()) {
       Alert.alert('Validation Error', 'Please fill all required fields');
@@ -104,17 +130,18 @@ export default function BusinessDetailsScreen({ route, navigation }) {
     }
 
     const businessData = {
-      searchKeywords: form.searchKeywords,
-      companyName: form.companyName,
-      businessCategory: form.businessCategory,
-      businessSubCategory: form.businessSubCategory,
+      keywords: form.searchKeywords,
+      company: form.companyName,
+      category: form.businessCategory,
+      subCategory: form.businessSubCategory,
       clients: form.clients,
-      businessDescription: form.businessDescription,
-      pdfFile: pdfFile,
+      description: form.businessDescription,
+      descriptionPdf: pdfFile,
+      logoImage: logoImage,
     };
 
     const cardData = {
-      ...personData,
+      ...personalData,
       ...businessData,
     };
 
@@ -409,6 +436,7 @@ export default function BusinessDetailsScreen({ route, navigation }) {
                   </View>
                 )}
               </View>
+
             </View>
 
             {/* BUTTON GROUP */}

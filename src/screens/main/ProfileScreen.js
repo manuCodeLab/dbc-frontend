@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import * as ImagePicker from 'expo-image-picker';
 import {
   View,
   Text,
@@ -7,6 +8,7 @@ import {
   TextInput,
   StatusBar,
   Alert,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,9 +29,11 @@ export default function ProfileScreen({ navigation, route }) {
     designation: '',
     bio: '',
     company: '',
+    profileImage: null,
   });
 
   const [editedData, setEditedData] = useState(profileData);
+    const [imageUploading, setImageUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const fromScreen = route?.params?.fromScreen || null;
 
@@ -50,6 +54,24 @@ export default function ProfileScreen({ navigation, route }) {
     };
     loadUserData();
   }, []);
+
+  const handleImagePick = async () => {
+    setImageUploading(true);
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+      if (!result.canceled) {
+        setEditedData({ ...editedData, profileImage: result.assets[0].uri });
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Failed to pick image');
+    }
+    setImageUploading(false);
+  };
    
 
   const handleEditChange = (field, value) => {
@@ -126,11 +148,33 @@ export default function ProfileScreen({ navigation, route }) {
 
       {/* Profile Avatar */}
       <View style={profileStyles.avatarContainer}>
-        <View style={profileStyles.avatar}>
-          <Text style={profileStyles.avatarText}>
-            {profileData.first?.charAt(0).toUpperCase() || 'U'}
-          </Text>
-        </View>
+        <TouchableOpacity onPress={isEditing ? handleImagePick : undefined}>
+          <View style={profileStyles.avatar}>
+            {editedData.profileImage ? (
+              <Image
+                source={{ uri: editedData.profileImage }}
+                style={profileStyles.avatarImage}
+              />
+            ) : (
+              <Text style={profileStyles.avatarText}>
+                {profileData.first?.charAt(0).toUpperCase() || 'U'}
+              </Text>
+            )}
+          </View>
+          {isEditing && (
+            <Text style={{ textAlign: 'center', color: COLORS.accent, marginTop: 4 }}>Upload Image</Text>
+          )}
+        </TouchableOpacity>
+        {/* Done button for image upload */}
+        {isEditing && editedData.profileImage && editedData.profileImage !== profileData.profileImage && (
+          <TouchableOpacity
+            style={profileStyles.saveButton}
+            onPress={handleSave}
+          >
+            <Ionicons name="checkmark" size={18} color="#fff" />
+            <Text style={profileStyles.saveButtonText}>Done</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* Profile Content Card */}

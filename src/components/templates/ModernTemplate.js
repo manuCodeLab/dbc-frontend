@@ -14,13 +14,15 @@ const ModernTemplate = ({ data, userData, isSelected }) => {
     phone = '+1 (555) 123-4567',
     email = 'email@example.com',
     website = 'www.example.com',
+    description = '',
+    businessDescription = '',
     linkedin = '',
     instagram = '',
     twitter = '',
   } = cardData;
 
-  // If this is being used for template selection (isSelected prop exists)
-  if (isSelected !== undefined) {
+  // If this is being used for template selection (isSelected prop is true)
+  if (isSelected === true) {
     return (
       <View style={[styles.selectionContainer, isSelected && styles.selected]}>
         <LinearGradient
@@ -119,6 +121,14 @@ const ModernTemplate = ({ data, userData, isSelected }) => {
             </View>
           )}
         </View>
+
+        {/* Business Description */}
+        {(description || businessDescription) && (
+          <View style={styles.descriptionSection}>
+            <Text style={styles.descriptionLabel}>About</Text>
+            <Text style={styles.descriptionText}>{description || businessDescription}</Text>
+          </View>
+        )}
 
         {/* Social Media Links */}
         {(linkedin || instagram || twitter) && (

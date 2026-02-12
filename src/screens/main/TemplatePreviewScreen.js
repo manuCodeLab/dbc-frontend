@@ -1,21 +1,25 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, StatusBar } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import ModernTemplate from '../../components/templates/ModernTemplate';
 import DarkTemplate from '../../components/templates/DarkTemplate';
 import ClassicTemplate from '../../components/templates/ClassicTemplate';
 import MinimalTemplate from '../../components/templates/MinimalTemplate';
-import ScreenWrapper from '../../components/common/ScreenWrapper';
-import Footer from '../../components/common/Footer';
 import { layoutStyles } from '../../styles/screens/personalDetailsLayoutStyles';
 import { getUser } from '../../utils/storage';
 import styles from '../../styles/screens/templatePreviewStyles';
 
-
 const TemplatePreviewScreen = ({ route, navigation }) => {
-  const { cardData, template } = route.params;
+  const routeParams = route?.params || {};
+  const { cardData = {} } = routeParams;
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [userInitial, setUserInitial] = React.useState('N');
+
+  React.useEffect(() => {
+    // Log received cardData for debugging
+    console.log('TemplatePreviewScreen received cardData:', JSON.stringify(cardData, null, 2));
+  }, [cardData]);
 
   React.useEffect(() => {
     let mounted = true;
@@ -37,35 +41,12 @@ const TemplatePreviewScreen = ({ route, navigation }) => {
     };
   }, []);
 
-  // Handle navigation focus
-  useFocusEffect(
-    React.useCallback(() => {
-      // Optional: Add any initialization logic here
-      return () => {
-        // Optional: Add any cleanup logic here
-      };
-    }, [])
-  );
-
-  const renderTemplate = () => {
-    switch (template) {
-      case 'modern':
-        return <ModernTemplate data={cardData} />;
-      case 'dark':
-        return <DarkTemplate data={cardData} />;
-      case 'classic':
-        return <ClassicTemplate data={cardData} />;
-      case 'minimal':
-        return <MinimalTemplate data={cardData} />;
-      default:
-        return <ModernTemplate data={cardData} />;
-    }
-  };
-
-  const handleSaveCard = () => {
-    // Navigate back to LandingScreen
-    navigation.navigate('Landing');
-  };
+  const templates = [
+    { id: 'classic', name: 'Classic', component: ClassicTemplate },
+    { id: 'modern', name: 'Modern', component: ModernTemplate },
+    { id: 'minimal', name: 'Minimal', component: MinimalTemplate },
+    { id: 'dark', name: 'Dark', component: DarkTemplate },
+  ];
 
   const navigateToProfile = () => {
     navigation.navigate('Profile');
@@ -75,9 +56,23 @@ const TemplatePreviewScreen = ({ route, navigation }) => {
     navigation.goBack();
   };
 
+  const handleSelectTemplate = (templateId) => {
+    setSelectedTemplate(templateId);
+  };
+
+  const handleViewPreview = () => {
+    if (selectedTemplate) {
+      navigation.navigate('FinalPreview', { 
+        cardData, 
+        template: selectedTemplate 
+      });
+    }
+  };
+
   return (
-    <ScreenWrapper>
+    <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      
       {/* ========== HEADER SECTION ========== */}
       <View style={layoutStyles.headerSection}>
         {/* Back Button */}
@@ -101,26 +96,63 @@ const TemplatePreviewScreen = ({ route, navigation }) => {
           <Text style={layoutStyles.profileIconText}>{userInitial}</Text>
         </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Template Preview */}
-        <View style={styles.previewContainer}>
-          {renderTemplate()}
+
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 30, paddingHorizontal: 16, paddingTop: 20 }}>
+        
+        {/* Title Section */}
+        <View style={{ marginBottom: 30 }}>
+          <Text style={[layoutStyles.mainTitle, { fontSize: 24, marginBottom: 8 }]}>Select a Template</Text>
+          <Text style={[layoutStyles.subtitle, { fontSize: 14 }]}>Choose a design for your digital business card</Text>
         </View>
 
-        {/* Save Card Button */}
-        <TouchableOpacity
-          style={styles.saveButton}
-          onPress={handleSaveCard}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.saveButtonText}>Save Card</Text>
-        </TouchableOpacity>
+        {/* Template Cards */}
+        <View>
+          {templates.map((template) => (
+            <TouchableOpacity
+              key={template.id}
+              style={[
+                styles.templateCard,
+                selectedTemplate === template.id && styles.templateCardSelected
+              ]}
+              onPress={() => handleSelectTemplate(template.id)}
+            >
+              {/* Card Preview */}
+              <View style={styles.cardPreviewWrapper}>
+                {(() => {
+                  const TemplateComponent = template.component;
+                  return <TemplateComponent data={cardData} />;
+                })()}
+              </View>
 
-        {/* Additional spacing */}
-        <View style={styles.bottomSpacer} />
+              {/* Template Name and Selection */}
+              <View style={styles.templateInfo}>
+                <Text style={styles.templateName}>{template.name}</Text>
+                <View style={[styles.radioButton, selectedTemplate === template.id && styles.radioButtonSelected]}>
+                  {selectedTemplate === template.id && (
+                    <Ionicons name="checkmark" size={16} color="#fff" />
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
       </ScrollView>
-      <Footer activeTab="" navigation={navigation} fromScreen="TemplatePreview" />
-    </ScreenWrapper>
+
+      {/* Bottom Action Button */}
+      <View style={styles.bottomSection}>
+        <TouchableOpacity 
+          style={[styles.continueButton, !selectedTemplate && styles.continueButtonDisabled]} 
+          onPress={handleViewPreview}
+          disabled={!selectedTemplate}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={styles.continueButtonText}>View Final Preview</Text>
+            <Ionicons name="chevron-forward" size={20} color="#fff" style={{ marginLeft: 8 }} />
+          </View>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 };
 

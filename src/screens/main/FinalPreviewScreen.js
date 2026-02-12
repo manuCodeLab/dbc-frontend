@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Alert,
-  SafeAreaView,
   ScrollView,
   Share,
   StatusBar,
@@ -28,8 +28,8 @@ const TEMPLATE_COMPONENTS = {
 };
 
 export default function FinalPreviewScreen({ route, navigation }) {
-  const { selectedTemplate, userData: routeUserData } = route?.params || {};
-  const [userData, setUserData] = useState(routeUserData || {});
+  // Receive cardData and template from navigation params
+  const { cardData = {}, template = 'classic' } = route?.params || {};
   const [userInitial, setUserInitial] = useState('N');
 
   useEffect(() => {
@@ -38,12 +38,17 @@ export default function FinalPreviewScreen({ route, navigation }) {
       try {
         const user = await getUser();
         if (mounted && user) {
-          const name = user.first || user.fullName || user.firstName || '';
-          const initial = name && name.trim().length ? name.trim().charAt(0).toUpperCase() : 'N';
+          const name = user?.first || user?.fullName || user?.firstName || '';
+          let initial = 'N';
+          if (typeof name === 'string' && name.trim().length > 0) {
+            initial = name.trim().charAt(0).toUpperCase();
+          }
           setUserInitial(initial);
+        } else {
+          setUserInitial('N');
         }
       } catch (e) {
-        // ignore
+        setUserInitial('N');
       }
     };
     loadUser();
@@ -52,34 +57,9 @@ export default function FinalPreviewScreen({ route, navigation }) {
     };
   }, []);
 
-  // Load real user data from storage if not provided in route
-  React.useEffect(() => {
-    if (!routeUserData || Object.keys(routeUserData).length === 0) {
-      (async () => {
-        try {
-          const { getUser } = await import('../../utils/storage');
-          const user = await getUser();
-          if (user) {
-            setUserData(user);
-          }
-        } catch (e) {
-          console.log('Error loading user:', e);
-        }
-      })();
-    }
-  }, [routeUserData]);
+  // Use cardData directly for the template
 
-  // User data with fallbacks
-  const finalUserData = {
-    name: userData?.name || userData?.fullName || 'Your Name',
-    title: userData?.title || userData?.designation || 'Your Title',
-    email: userData?.email || 'your.email@example.com',
-    phone: userData?.phone || '+1 (555) 000-0000',
-    company: userData?.company || userData?.organization || 'Your Company',
-    website: userData?.website || 'www.yourwebsite.com',
-  };
-
-  const SelectedComponent = TEMPLATE_COMPONENTS[selectedTemplate] || ClassicTemplate;
+  const SelectedComponent = TEMPLATE_COMPONENTS[template] || ClassicTemplate;
 
   const handleSaveCard = useCallback(() => {
     Alert.alert(
@@ -179,16 +159,13 @@ export default function FinalPreviewScreen({ route, navigation }) {
         <View style={styles.templateNameSection}>
           <Text style={styles.templateLabel}>Template:</Text>
           <Text style={styles.templateName}>
-            {selectedTemplate.charAt(0).toUpperCase() + selectedTemplate.slice(1)}
+            {(template ? template.charAt(0).toUpperCase() + template.slice(1) : 'Classic')}
           </Text>
         </View>
 
         {/* Card Preview */}
         <View style={styles.previewContainer}>
-          <SelectedComponent
-            userData={finalUserData}
-            isSelected={true}
-          />
+          <SelectedComponent data={cardData} />
         </View>
 
         {/* Card Details */}
@@ -291,7 +268,7 @@ export default function FinalPreviewScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#FFFFFF'
   },
   scrollContent: {
     paddingBottom: 30,

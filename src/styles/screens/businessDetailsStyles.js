@@ -117,6 +117,34 @@ export const businessDetailsStyles = StyleSheet.create({
     flex: 1,
   },
 
+  /* LOGO PREVIEW */
+  logoPreviewContainer: {
+    marginTop: 12,
+    padding: 12,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+
+  logoPreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+
+  logoInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  logoFileName: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#15803d',
+    marginLeft: 8,
+  },
+
   /* BUTTON CONTAINER */
   buttonContainer: {
     paddingHorizontal: 20,
