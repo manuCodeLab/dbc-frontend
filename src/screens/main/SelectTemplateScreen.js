@@ -175,7 +175,7 @@ export default function SelectTemplateScreen({ route, navigation }) {
       <View style={styles.bottomSection}>
         <TouchableOpacity 
           style={[styles.continueButton, (!selected || templates.length === 0) && styles.continueButtonDisabled]} 
-          onPress={() => selected && navigation.navigate('FinalPreview', { selectedTemplate: selected, userData: userData })}
+          onPress={() => selected && navigation.navigate('FinalPreview', { template: selected, userData: userData })}
           disabled={!selected || templates.length === 0}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>

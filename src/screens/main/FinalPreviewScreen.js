@@ -31,6 +31,15 @@ export default function FinalPreviewScreen({ route, navigation }) {
   // Receive cardData and template from navigation params
   const { cardData = {}, template = 'classic' } = route?.params || {};
   const [userInitial, setUserInitial] = useState('N');
+  // Use cardData for contact info display
+  const finalUserData = {
+    name: cardData.name || cardData.fullName || 'Your Name',
+    title: cardData.title || cardData.designation || 'Your Title',
+    email: cardData.email || 'your.email@example.com',
+    phone: cardData.phone || '+1 (555) 000-0000',
+    company: cardData.company || cardData.organization || 'Your Company',
+    website: cardData.website || 'www.yourwebsite.com',
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -64,7 +73,7 @@ export default function FinalPreviewScreen({ route, navigation }) {
   const handleSaveCard = useCallback(() => {
     Alert.alert(
       'Save Card',
-      `Your ${selectedTemplate} template card has been saved successfully!`,
+      `Your ${template} template card has been saved successfully!`,
       [
         {
           text: 'OK',
@@ -75,7 +84,7 @@ export default function FinalPreviewScreen({ route, navigation }) {
         },
       ]
     );
-  }, [selectedTemplate, navigation]);
+  }, [template, navigation]);
 
   const handleDownloadCard = useCallback(() => {
     Alert.alert(
@@ -161,6 +170,30 @@ export default function FinalPreviewScreen({ route, navigation }) {
           <Text style={styles.templateName}>
             {(template ? template.charAt(0).toUpperCase() + template.slice(1) : 'Classic')}
           </Text>
+          {/* Template Color Display */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+            <Text style={{ fontSize: 12, color: '#999', marginRight: 8 }}>Color:</Text>
+            {(() => {
+              // Template color mapping
+              const colorMap = {
+                classic: '#1565C0',
+                modern: 'linear-gradient(90deg, #667EEA, #764BA2)',
+                minimal: '#FAFAFA',
+                dark: '#1A1A1A',
+              };
+              const color = colorMap[template] || '#1565C0';
+              if (template === 'modern') {
+                return (
+                  <View style={{ width: 40, height: 16, borderRadius: 8, backgroundColor: '#667EEA', overflow: 'hidden', marginRight: 4 }}>
+                    <View style={{ width: 40, height: 16, borderRadius: 8, backgroundColor: '#764BA2', position: 'absolute', left: 20, top: 0 }} />
+                  </View>
+                );
+              }
+              return (
+                <View style={{ width: 40, height: 16, borderRadius: 8, backgroundColor: color }} />
+              );
+            })()}
+          </View>
         </View>
 
         {/* Card Preview */}
@@ -221,15 +254,6 @@ export default function FinalPreviewScreen({ route, navigation }) {
             <Text style={styles.actionButtonText}>Save This Card</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.actionButton, styles.actionButtonSecondary]}
-            onPress={handleEditCard}
-          >
-            <Ionicons name="pencil" size={20} color="#D4AF37" />
-            <Text style={[styles.actionButtonText, styles.actionButtonTextSecondary]}>
-              Edit Information
-            </Text>
-          </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.actionButton, styles.actionButtonTertiary]}
