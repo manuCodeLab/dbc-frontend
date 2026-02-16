@@ -17,7 +17,8 @@ import OtpInput from '../../components/form/OtpInput';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
 import { COLORS } from '../../styles/colors';
 import { signupStyles } from '../../styles/screens/signupStyles';
-import { saveUser } from "../../utils/storage";
+
+import { mobileSignupUser } from '../../utils/api';
 
 // Generate random OTP
 const generateOTP = (length = 4) => {
@@ -91,8 +92,8 @@ export default function SignupScreen({ navigation }) {
     if (name === 'last' && value.length < 2) msg = 'Enter valid last name';
     if (name === 'phone' && !validPhone(value)) msg = 'Enter valid 10 digit number';
     if (name === 'email' && value && !validEmail(value)) msg = 'Enter valid email';
-    if (name === 'otpPhone' && value.length !== 4) msg = 'Enter 4 digit OTP';
-    if (name === 'otpEmail' && value.length !== 4) msg = 'Enter 4 digit OTP';
+    if (name === 'otpPhone' && value.length !== 6) msg = 'Enter 6 digit OTP';
+    if (name === 'otpEmail' && value.length !== 6) msg = 'Enter 6 digit OTP';
 
     setErrors((p) => ({ ...p, [name]: msg }));
   };
@@ -113,7 +114,7 @@ export default function SignupScreen({ navigation }) {
       clean = value.replace(/\D/g, '').slice(0, 10);
 
     if (name === 'otpPhone' || name === 'otpEmail')
-      clean = value.replace(/\D/g, '').slice(0, 4);
+      clean = value.replace(/\D/g, '').slice(0, 6);
 
     setForm((p) => ({ ...p, [name]: clean }));
     validate(name, clean);
@@ -128,7 +129,6 @@ export default function SignupScreen({ navigation }) {
     (!form.email || validEmail(form.email)) &&
     !errors.first &&
     !errors.last &&
-    !errors.phone &&
     !errors.email;
 
   const phoneValid = validPhone(form.phone) && !errors.phone;
@@ -139,8 +139,8 @@ export default function SignupScreen({ navigation }) {
     form.last.length >= 2 &&
     phoneValid &&
     emailValid &&
-    form.otpPhone.length === 4 &&
-    (!form.email || form.otpEmail.length === 4) &&
+    form.otpPhone.length === 6 &&
+    (!form.email || form.otpEmail.length === 6) &&
     !errors.first &&
     !errors.last &&
     !errors.phone &&
@@ -148,7 +148,8 @@ export default function SignupScreen({ navigation }) {
     otpPhoneVerified &&
     (!form.email || otpEmailVerified);
 
-  const handleValidateOtpPhone = () => {
+  // Send phone OTP using /auth/mobile-signup with all user info
+  const handleValidateOtpPhone = async () => {
     if (wrongOtpPhoneCooldown > 0) {
       Alert.alert('Please Wait', `You can request OTP again in ${wrongOtpPhoneCooldown} seconds`);
       return;
@@ -157,22 +158,50 @@ export default function SignupScreen({ navigation }) {
       Alert.alert('Error', 'Enter a valid phone number');
       return;
     }
-    setOtpPhoneVerified(false);
-    const randomOtp = generateOTP(4).toString();
-    setGeneratedOtpPhone(randomOtp);
-    Alert.alert('Phone OTP', `Your phone OTP is ${randomOtp}`);
-    setOtpVisiblePhone(true);
-    setTimerPhone(30);
-    setWrongOtpPhoneCooldown(0);
+    if (form.first.length < 2 || form.last.length < 2) {
+      Alert.alert('Error', 'Please enter valid first and last name');
+      return;
+    }
+    try {
+      const payload = {
+        firstName: form.first,
+        middleName: form.middle,
+        lastName: form.last,
+        mobileNumber: form.phone
+      };
+      console.log('Sending OTP request:', payload);
+      const curl = `curl -X POST http://192.168.31.173:9090/auth/mobile-signup -H "Content-Type: application/json" -d '${JSON.stringify(payload)}'`;
+      console.log('CURL command:', curl);
+      const res = await fetch('http://192.168.31.173:9090/auth/mobile-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      console.log('OTP response status:', res.status);
+      const data = await res.json();
+      console.log('OTP response data:', data);
+      if (res.ok && data.status === 1) {
+        setOtpPhoneVerified(false);
+        setOtpVisiblePhone(true);
+        setTimerPhone(30);
+        setWrongOtpPhoneCooldown(0);
+        Alert.alert('Success', data.message || 'OTP sent to your mobile number.');
+      } else {
+        Alert.alert('Error', data.message || 'Failed to send OTP');
+      }
+    } catch (err) {
+      console.error('OTP request error:', err);
+      Alert.alert('Error', 'Failed to send OTP');
+    }
   };
 
-  const handleValidateOtpEmail = () => {
+  // Send email OTP using backend
+  const handleValidateOtpEmail = async () => {
     if (wrongOtpEmailCooldown > 0) {
       Alert.alert('Please Wait', `You can request OTP again in ${wrongOtpEmailCooldown} seconds`);
       return;
     }
     if (!form.email) {
-      // If no email provided, skip OTP verification
       setOtpEmailVerified(true);
       return;
     }
@@ -180,16 +209,30 @@ export default function SignupScreen({ navigation }) {
       Alert.alert('Error', 'Enter a valid email');
       return;
     }
-    setOtpEmailVerified(false);
-    const randomOtp = generateOTP(4).toString();
-    setGeneratedOtpEmail(randomOtp);
-    Alert.alert('Email OTP', `Your email OTP is ${randomOtp}`);
-    setOtpVisibleEmail(true);
-    setTimerEmail(30);
-    setWrongOtpEmailCooldown(0);
+    try {
+      // Use backend endpoint for sending email OTP
+      const res = await fetch('http://192.168.31.173:9090/auth/send-otp-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setOtpEmailVerified(false);
+        setOtpVisibleEmail(true);
+        setTimerEmail(30);
+        setWrongOtpEmailCooldown(0);
+        Alert.alert('Email OTP', 'OTP sent to your email.');
+      } else {
+        Alert.alert('Error', data.message || 'Failed to send OTP');
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Failed to send OTP');
+    }
   };
 
-  const handleResendPhoneOtp = () => {
+  // Resend phone OTP using backend
+  const handleResendPhoneOtp = async () => {
     if (wrongOtpPhoneCooldown > 0) {
       Alert.alert('Please Wait', `You can resend OTP again in ${wrongOtpPhoneCooldown} seconds`);
       return;
@@ -199,22 +242,40 @@ export default function SignupScreen({ navigation }) {
       Alert.alert('Error', 'Enter a valid phone number');
       return;
     }
-    setOtpPhoneVerified(false);
-    const randomOtp = generateOTP(4).toString();
-    setGeneratedOtpPhone(randomOtp);
-    Alert.alert('Phone OTP', `Your phone OTP is ${randomOtp}`);
-    setOtpVisiblePhone(true);
-    setTimerPhone(30);
+    try {
+      const url = 'http://192.168.31.173:9090/auth/resend-mobile-otp';
+      const payload = { mobileNumber: form.phone };
+      console.log('[DEBUG] Resend phone OTP:', { url, payload });
+      console.log('[DEBUG] curl command:', `curl -X POST '${url}' -H 'Content-Type: application/json' -d '${JSON.stringify(payload)}'`);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      console.log('[DEBUG] Response:', data);
+      if (res.ok && data.success) {
+        setOtpPhoneVerified(false);
+        setOtpVisiblePhone(true);
+        setTimerPhone(30);
+        Alert.alert('Phone OTP', 'OTP resent to your mobile number.');
+      } else {
+        Alert.alert('Error', data.message || 'Failed to resend OTP');
+      }
+    } catch (err) {
+      console.log('[DEBUG] Resend phone OTP error:', err);
+      Alert.alert('Error', 'Failed to resend OTP');
+    }
   };
 
-  const handleResendEmailOtp = () => {
+  // Resend email OTP using backend
+  const handleResendEmailOtp = async () => {
     if (wrongOtpEmailCooldown > 0) {
       Alert.alert('Please Wait', `You can resend OTP again in ${wrongOtpEmailCooldown} seconds`);
       return;
     }
     if (otpEmailVerified) return;
     if (!form.email) {
-      // If no email provided, just mark as verified
       setOtpEmailVerified(true);
       return;
     }
@@ -222,73 +283,109 @@ export default function SignupScreen({ navigation }) {
       Alert.alert('Error', 'Enter a valid email');
       return;
     }
-    setOtpEmailVerified(false);
-    const randomOtp = generateOTP(4).toString();
-    setGeneratedOtpEmail(randomOtp);
-    Alert.alert('Email OTP', `Your email OTP is ${randomOtp}`);
-    setOtpVisibleEmail(true);
-    setTimerEmail(30);
+    try {
+      const res = await fetch('http://192.168.31.173:9090/auth/resend-email-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setOtpEmailVerified(false);
+        setOtpVisibleEmail(true);
+        setTimerEmail(30);
+        Alert.alert('Email OTP', 'OTP resent to your email.');
+      } else {
+        Alert.alert('Error', data.message || 'Failed to resend OTP');
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Failed to resend OTP');
+    }
   };
 
-  const handleVerifyPhoneOtp = () => {
-    if (form.otpPhone === generatedOtpPhone) {
-      setOtpPhoneVerified(true);
-      Alert.alert('Verified', 'Phone OTP verified');
-    } else {
+  // Verify phone OTP using backend
+  const handleVerifyPhoneOtp = async () => {
+    console.log('[DEBUG] phone and OTP:', { mobileNumber: form.phone, otp: form.otpPhone });
+    try {
+      const url = 'http://192.168.31.173:9090/auth/verify-number-otp';
+      const payload = { mobileNumber: form.phone, otp: form.otpPhone };
+      console.log('[DEBUG] Verifying phone OTP:', { url, payload });
+      console.log('[DEBUG] curl command:', `curl -X POST '${url}' -H 'Content-Type: application/json' -d '${JSON.stringify(payload)}'`);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      console.log('[DEBUG] Response:', data);
+      if (res.ok && data.status === 1) {
+        setOtpPhoneVerified(true);
+        Alert.alert('Verified', data.message || 'Phone OTP verified');
+      } else {
+        setOtpPhoneVerified(false);
+        setForm((p) => ({ ...p, otpPhone: '' }));
+        setWrongOtpPhoneCooldown(30);
+        Alert.alert('Invalid', data.message || 'Phone OTP is incorrect. Try again after 30 seconds');
+      }
+    } catch (err) {
+      console.log('[DEBUG] OTP verification error:', err);
       setOtpPhoneVerified(false);
       setForm((p) => ({ ...p, otpPhone: '' }));
       setWrongOtpPhoneCooldown(30);
-      Alert.alert('Invalid', 'Phone OTP is incorrect. Try again after 30 seconds');
+      Alert.alert('Error', 'Failed to verify OTP');
     }
   };
 
-  const handleVerifyEmailOtp = () => {
-    if (form.otpEmail === generatedOtpEmail) {
-      setOtpEmailVerified(true);
-      Alert.alert('Verified', 'Email OTP verified');
-    } else {
+  // Verify email OTP using backend
+  const handleVerifyEmailOtp = async () => {
+    try {
+      const res = await fetch('http://192.168.31.173:9090/auth/verify-email-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email, otp: form.otpEmail })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setOtpEmailVerified(true);
+        Alert.alert('Verified', 'Email OTP verified');
+      } else {
+        setOtpEmailVerified(false);
+        setForm((p) => ({ ...p, otpEmail: '' }));
+        setWrongOtpEmailCooldown(30);
+        Alert.alert('Invalid', data.message || 'Email OTP is incorrect. Try again after 30 seconds');
+      }
+    } catch (err) {
       setOtpEmailVerified(false);
       setForm((p) => ({ ...p, otpEmail: '' }));
       setWrongOtpEmailCooldown(30);
-      Alert.alert('Invalid', 'Email OTP is incorrect. Try again after 30 seconds');
+      Alert.alert('Error', 'Failed to verify OTP');
     }
   };
 
-  // ✅ SAVE USER DATA ON SIGNUP
+  // Signup using backend (mobile signup)
   const handleSubmit = async () => {
-    // Check phone OTP
-    if (form.otpPhone !== generatedOtpPhone) {
-      Alert.alert('Wrong OTP', 'Phone OTP is incorrect');
-      setForm((p) => ({ ...p, otpPhone: '', otpEmail: '' }));
+    if (!otpPhoneVerified) {
+      Alert.alert('Error', 'Please verify your phone OTP');
       return;
     }
-
-    // Check email OTP if email is provided
-    if (form.email && form.otpEmail !== generatedOtpEmail) {
-      Alert.alert('Wrong OTP', 'Email OTP is incorrect');
-      setForm((p) => ({ ...p, otpPhone: '', otpEmail: '' }));
-      return;
-    }
-
+    // Email OTP can be handled separately if required by backend
     try {
-      // Save basic user data to AsyncStorage
-      const basicUserData = {
+      const res = await mobileSignupUser({
         first: form.first,
         middle: form.middle,
         last: form.last,
-        phone: form.phone,
-        email: form.email || null,
-        isLoggedIn: false, // Not logged in yet
-      };
-      
-      await saveUser(basicUserData);
-      
-      Alert.alert('Success', 'Account Created', [
-        {
-          text: 'OK',
-          onPress: () => navigation.replace('Login'),
-        },
-      ]);
+        mobileNumber: form.phone,
+      });
+      if (res.success && res.data) {
+        Alert.alert('Success', 'Account Created', [
+          {
+            text: 'OK',
+            onPress: () => navigation.replace('Login'),
+          },
+        ]);
+      } else {
+        Alert.alert('Error', res.error || 'Failed to create account');
+      }
     } catch (error) {
       Alert.alert('Error', 'Failed to create account');
     }
@@ -353,14 +450,22 @@ export default function SignupScreen({ navigation }) {
 
             {otpVisiblePhone && (
               <>
+                {console.log('[DEBUG] Rendering OtpInput for phone:', {
+                  otpVisiblePhone,
+                  value: form.otpPhone,
+                  rightButton: {
+                    label: otpPhoneVerified ? 'Verified' : 'Verify',
+                    disabled: form.otpPhone.length !== 6 || otpPhoneVerified,
+                  }
+                })}
                 <OtpInput
-                  length={4}
+                  length={6}
                   value={form.otpPhone}
                   onChangeText={(v) => handleChange('otpPhone', v)}
                   rightButton={{
                     label: otpPhoneVerified ? 'Verified' : 'Verify',
                     onPress: handleVerifyPhoneOtp,
-                    disabled: form.otpPhone.length !== 4 || otpPhoneVerified,
+                    disabled: form.otpPhone.length !== 6 || otpPhoneVerified,
                   }}
                 />
 
@@ -398,13 +503,13 @@ export default function SignupScreen({ navigation }) {
             {otpVisibleEmail && form.email && (
               <>
                 <OtpInput
-                  length={4}
+                  length={6}
                   value={form.otpEmail}
                   onChangeText={(v) => handleChange('otpEmail', v)}
                   rightButton={{
                     label: otpEmailVerified ? 'Verified' : 'Verify',
                     onPress: handleVerifyEmailOtp,
-                    disabled: form.otpEmail.length !== 4 || otpEmailVerified,
+                    disabled: form.otpEmail.length !== 6 || otpEmailVerified,
                   }}
                 />
 

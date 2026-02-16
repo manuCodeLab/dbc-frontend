@@ -16,19 +16,17 @@ import InputField from '../../components/form/InputField';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
 import { COLORS } from '../../styles/colors';
 import { loginStyles } from '../../styles/screens/loginStyles';
-import { getUser, saveUser } from '../../utils/storage';
+
+import { loginUser, sendOtp } from '../../utils/api';
 
 const { width } = Dimensions.get('window');
 
-// Generate random OTP
-const generateOTP = (length = 4) => {
-  return Math.floor(Math.pow(10, length - 1) + Math.random() * (Math.pow(10, length) - Math.pow(10, length - 1)));
-};
+
 
 export default function LoginScreen({ navigation }) {
   const [phone, setPhone] = useState('');
   const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState(['', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [generatedOtp, setGeneratedOtp] = useState('');
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
@@ -59,38 +57,48 @@ export default function LoginScreen({ navigation }) {
     setPhone(cleaned);
   };
 
-  // Send OTP (Random Generated)
-  const handleSendOtp = () => {
+
+  // Send OTP using backend API
+  const handleSendOtp = async () => {
     if (wrongOtpCooldown > 0) {
       Alert.alert('Please Wait', `You can send OTP again in ${wrongOtpCooldown} seconds`);
       return;
     }
-    
     if (!/^[1-9]\d{9}$/.test(phone)) {
-      Alert.alert(
-        'Invalid Number',
-        'Enter valid  mobile number (starts with 1-9)'
-      );
+      Alert.alert('Invalid Number', 'Enter valid  mobile number (starts with 1-9)');
       return;
     }
-
-    const randomOtp = generateOTP().toString();
-    setGeneratedOtp(randomOtp);
-    Alert.alert('OTP Sent ✅', `Your OTP is: ${randomOtp}`);
-
-    setOtpSent(true);
-    setTimer(30);
-    setCanResend(false);
-    setWrongOtpCooldown(0);
+    try {
+      const res = await sendOtp(phone);
+      if (res.success) {
+        Alert.alert('OTP Sent ✅', 'OTP has been sent to your mobile number.');
+        setOtpSent(true);
+        setTimer(30);
+        setCanResend(false);
+        setWrongOtpCooldown(0);
+      } else {
+        Alert.alert('Error', res.error || 'Failed to send OTP');
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Failed to send OTP');
+    }
   };
 
-  const handleResendOtp = () => {
+
+  const handleResendOtp = async () => {
     if (!canResend) return;
-    const randomOtp = generateOTP().toString();
-    setGeneratedOtp(randomOtp);
-    Alert.alert('OTP Resent ✅', `Your OTP is: ${randomOtp}`);
-    setTimer(30);
-    setCanResend(false);
+    try {
+      const res = await sendOtp(phone);
+      if (res.success) {
+        Alert.alert('OTP Resent ✅', 'OTP has been resent to your mobile number.');
+        setTimer(30);
+        setCanResend(false);
+      } else {
+        Alert.alert('Error', res.error || 'Failed to resend OTP');
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Failed to resend OTP');
+    }
   };
 
   const handleOtpChange = (val, index) => {
@@ -108,36 +116,32 @@ export default function LoginScreen({ navigation }) {
     }, 100);
   };
 
+
+  // Login using backend API
   const handleLogin = async () => {
-    if (otp.join('') === generatedOtp) {
-      try {
-        // Verify user exists in storage
-        const user = await getUser();
-        if (!user) {
-          Alert.alert('Error', 'User not found. Please sign up first.');
-          resetOtpBoxes();
-          return;
-        }
-        
-        // Verify phone number matches
-        if (user.phone !== phone) {
-          Alert.alert('Error', 'Phone number does not match signup');
-          resetOtpBoxes();
-          return;
-        }
-        
-        // Update login status and redirect to Landing page
-        await saveUser({ ...user, isLoggedIn: true });
-        Alert.alert('Success 🎉', 'OTP Verified');
+    const enteredOtp = otp.join('');
+    if (enteredOtp.length !== 6) {
+      Alert.alert('Error', 'Please enter the 6-digit OTP');
+      return;
+    }
+    try {
+      console.log('[DEBUG] Login request:', { mobileNumber: phone, otp: enteredOtp });
+      console.log('[DEBUG] curl command:', `curl -X POST 'http://192.168.31.173:9090/api/auth/login' -H 'Content-Type: application/json' -d '{"mobileNumber":"${phone}","otp":"${enteredOtp}"}'`);
+      const res = await loginUser(phone, enteredOtp);
+      console.log('[DEBUG] Login response:', res);
+      if (res.success && res.data) {
+        Alert.alert('Success 🎉', 'Login successful!');
         navigation.navigate('Landing');
-      } catch (error) {
-        Alert.alert('Error', 'Login failed');
+      } else {
         resetOtpBoxes();
+        setWrongOtpCooldown(30);
+        Alert.alert('Login Failed', res.error || 'Invalid OTP or phone number');
       }
-    } else {
+    } catch (err) {
+      console.log('[DEBUG] Login error:', err);
       resetOtpBoxes();
       setWrongOtpCooldown(30);
-      Alert.alert('Wrong OTP ❌', 'Entered OTP is incorrect. Try again after 30 seconds');
+      Alert.alert('Error', 'Login failed');
     }
   };
 
@@ -192,7 +196,7 @@ export default function LoginScreen({ navigation }) {
                           setOtp(copy);
 
                           // Move forward
-                          if (v && i < 3) {
+                          if (v && i < 5) {
                             inputs.current[i + 1].focus();
                           }
                         }}
@@ -207,7 +211,6 @@ export default function LoginScreen({ navigation }) {
                           }
                         }}
                       />
-
                     ))}
                   </View>
 

@@ -1,5 +1,5 @@
 // Base API configuration
-const BASE_URL = 'http://localhost:5000/api'; // Update with your actual API URL
+const BASE_URL = 'http://192.168.31.173:9090/api'; // Updated to new backend URL
 
 // Default headers
 const defaultHeaders = {
@@ -55,20 +55,26 @@ export const apiCall = async (endpoint, options = {}) => {
 /**
  * Login API call
  */
-export const loginUser = (phone, otp) => {
+export const loginUser = (mobileNumber, otp) => {
   return apiCall('/auth/login', {
     method: 'POST',
-    data: { phone, otp },
+    data: { mobileNumber, otp },
   });
 };
 
+
 /**
- * Signup API call
+ * Mobile Signup API call (for phone OTP signup)
  */
-export const signupUser = (userData) => {
-  return apiCall('/auth/signup', {
+export const mobileSignupUser = ({ first, middle, last, phone }) => {
+  return apiCall('/auth/mobile-signup', {
     method: 'POST',
-    data: userData,
+    data: {
+      firstName: first,
+      middleName: middle,
+      lastName: last,
+      mobileNumber: phone,
+    },
   });
 };
 
@@ -76,7 +82,7 @@ export const signupUser = (userData) => {
  * Send OTP API call
  */
 export const sendOtp = (phone) => {
-  return apiCall('/auth/send-otp', {
+  return apiCall('auth/mobile-signup', {
     method: 'POST',
     data: { phone },
   });

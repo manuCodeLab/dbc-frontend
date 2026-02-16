@@ -14,7 +14,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { profileStyles } from '../../styles/screens/profileStyles';
 import { COLORS } from '../../styles/colors';
-import { getUser, saveUser, clearUser } from '../../utils/storage';
+
+import { apiCall } from '../../utils/api';
 import Footer from '../../components/common/Footer';
 
 
@@ -41,10 +42,10 @@ export default function ProfileScreen({ navigation, route }) {
   useEffect(() => {
     const loadUserData = async () => {
       try {
-        const user = await getUser();
-        if (user) {
-          setProfileData(user);
-          setEditedData(user);
+        const res = await apiCall('/profile/get-profile', { method: 'GET' });
+        if (res.success && res.data) {
+          setProfileData(res.data);
+          setEditedData(res.data);
         }
       } catch (error) {
         Alert.alert('Error', 'Failed to load profile');
@@ -83,13 +84,19 @@ export default function ProfileScreen({ navigation, route }) {
 
   const handleSave = async () => {
     try {
-      // Save extra details to AsyncStorage
-      await saveUser(editedData);
-      setProfileData(editedData);
-      setIsEditing(false);
-      Alert.alert('Success', 'Profile updated successfully');
+      const res = await apiCall('/profile/update-profile', {
+        method: 'PUT',
+        data: editedData,
+      });
+      if (res.success && res.data) {
+        setProfileData(res.data);
+        setIsEditing(false);
+        Alert.alert('Success', 'Profile updated successfully');
+      } else {
+        Alert.alert('Error', res.error || 'Failed to update profile');
+      }
     } catch (error) {
-      Alert.alert('Error', 'Failed to save profile');
+      Alert.alert('Error', 'Failed to update profile');
     }
   };
 
@@ -104,8 +111,12 @@ export default function ProfileScreen({ navigation, route }) {
 
   const handleLogout = async () => {
     try {
-      await clearUser();
-      navigation.replace('Splash');
+      const res = await apiCall('/profile/logout', { method: 'POST' });
+      if (res.success) {
+        navigation.replace('Splash');
+      } else {
+        Alert.alert('Error', res.error || 'Failed to logout');
+      }
     } catch (error) {
       Alert.alert('Error', 'Failed to logout');
     }

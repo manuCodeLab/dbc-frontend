@@ -5,6 +5,7 @@ import { COLORS } from '../../styles/colors';
 const { width } = Dimensions.get('window');
 
 const OtpInput = ({ length = 6, onChangeText, value = '', rightButton }) => {
+  console.log('[DEBUG] OtpInput props:', { value, rightButton });
   const inputs = useRef([]);
 
   const handleChange = (text, index) => {
@@ -33,7 +34,7 @@ const OtpInput = ({ length = 6, onChangeText, value = '', rightButton }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.inputsWrap}>
+      <View style={styles.inputsRow}>
         {Array(length)
           .fill('')
           .map((_, index) => (
@@ -50,13 +51,17 @@ const OtpInput = ({ length = 6, onChangeText, value = '', rightButton }) => {
           ))}
       </View>
       {rightButton ? (
-        <TouchableOpacity
-          style={[styles.verifyBtn, rightButton.disabled && { opacity: 0.5 }]}
-          onPress={rightButton.onPress}
-          disabled={rightButton.disabled}
-        >
-          <Text style={styles.verifyText}>{rightButton.label}</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={[styles.verifyBtnFull, rightButton.disabled && { opacity: 0.5 }]}
+            onPress={() => {
+              rightButton.onPress && rightButton.onPress();
+            }}
+            disabled={rightButton.disabled}
+          >
+            <Text style={styles.verifyText}>{rightButton.label}</Text>
+          </TouchableOpacity>
+        </View>
       ) : null}
     </View>
   );
@@ -64,17 +69,18 @@ const OtpInput = ({ length = 6, onChangeText, value = '', rightButton }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    width: '100%',
     marginVertical: 18,
   },
-  inputsWrap: {
+  inputsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    flex: 1,
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 8,
   },
   input: {
-    width: width / 8,
+    flex: 1,
     height: 48,
     borderWidth: 2,
     borderColor: COLORS.accent,
@@ -83,11 +89,17 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: COLORS.text,
     fontWeight: '700',
+    marginHorizontal: 2,
+    maxWidth: 48,
   },
-  verifyBtn: {
-    marginLeft: 12,
+  buttonRow: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  verifyBtnFull: {
+    width: '60%',
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 12,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
