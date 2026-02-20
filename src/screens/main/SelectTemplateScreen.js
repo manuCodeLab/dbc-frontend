@@ -184,7 +184,11 @@ export default function SelectTemplateScreen({ route, navigation }) {
           </View>
         </TouchableOpacity>
       </View>
+<<<<<<< HEAD
       {/* <Footer activeTab="" navigation={navigation} fromScreen="SelectTemplate" /> */}
+=======
+      <Footer activeTab="" navigation={navigation} fromScreen="SelectTemplate" />
+>>>>>>> a997e34 (otp error fixed)
     </SafeAreaView>
   );
 }
