@@ -15,7 +15,7 @@
 // export const BASE_URL = 'http://10.89.127.72:9090';
 
 
-export const BASE_URL = 'http://10.157.11.72:9090';
+export const BASE_URL = 'http://192.168.0.53:9090';
 
 // Default headers
 export const defaultHeaders = {
