@@ -72,7 +72,7 @@ export default function InputField({
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: 18,
+    marginBottom: 12,
   },
 
   // ---------- LABEL ----------
@@ -110,11 +110,11 @@ const styles = StyleSheet.create({
   inputBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 58,
+    height: 48,
     borderWidth: 2,
     borderColor: COLORS.accent,
-    borderRadius: 22,
-    paddingHorizontal: 14,
+    borderRadius: 16,
+    paddingHorizontal: 12,
     backgroundColor: '#FFFFFF',
 
     // premium shadow
@@ -141,17 +141,17 @@ const styles = StyleSheet.create({
   // 🔥 MOST IMPORTANT PART (fixes invisible typing)
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     color: COLORS.text,
     paddingVertical: 0,
   },
   rightBtn: {
     backgroundColor: COLORS.primary,
     paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingVertical: 5,
     borderRadius: 12,
     marginLeft: 10,
-    height: 36,
+    height: 32,
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -109,6 +109,7 @@ export const loginStyles = StyleSheet.create({
     color: COLORS.accent,
     fontSize: 15,
     fontWeight: '700',
+    marginLeft: 8,
   },
   loginBtn: {
     backgroundColor: COLORS.accent,
